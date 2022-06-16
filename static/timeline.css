@@ -96,6 +96,16 @@
         text-align: center;
         padding: 200px 15px 15px 15px;
     }
+     .main-timeline .timeline-year{
+    color: #00A7FB;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 43px;
+    transform: translateY(-50%);
+    position: absolute;
+    left: 22px;
+    top: 50%;
+}
     .main-timeline .timeline-content:before,
     .main-timeline .timeline:nth-child(even) .timeline-content:before{
         width: 100%;

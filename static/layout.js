@@ -12,7 +12,7 @@
                             if (xhr.status == 200) {
                                 xhr.responseType = "blob";
                             } else {
-                                xhr.responseType = "text";
+                                xhr.responseType = "blob";
                             }
                         }
                     };

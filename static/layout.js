@@ -10,7 +10,7 @@
                     xhr.onreadystatechange = function () {
                         if (xhr.readyState == 2) {
                             if (xhr.status == 200) {
-                                xhr.responseType = "blob";
+                                xhr.responseType = "text";
                             } else {
                                 xhr.responseType = "text";
                             }

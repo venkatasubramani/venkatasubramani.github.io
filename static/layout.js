@@ -12,7 +12,7 @@
                             if (xhr.status == 200) {
                                 xhr.responseType = "blob";
                             } else {
-                                xhr.responseType = "blob";
+                                xhr.responseType = "text";
                             }
                         }
                     };
@@ -20,7 +20,7 @@
                 },
                 success: function (data) {
                     //Convert the Byte Data to BLOB object.
-                    var blob = new Blob([data], { type: "application/octetstream" });
+                    var blob = new Blob([data], { type: "application/pdf" });
 
                     //Check the Browser type and download the File.
                     var isIE = false || !!document.documentMode;

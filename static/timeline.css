@@ -73,7 +73,7 @@
 }
 .main-timeline .timeline:nth-child(even) .timeline-year{
     left: auto;
-    right: 19px;
+    right: 12px;
 }
 .main-timeline .timeline:nth-child(even) .timeline-icon{
     left: auto;

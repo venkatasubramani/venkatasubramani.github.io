@@ -15,6 +15,9 @@
   <link rel="stylesheet" media="all" href="static/timeline.css">
 <style>
 html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
+#profile:hover, #profile:focus{
+    background: green;    
+}
 </style>
 </head>
 <body class="light-grey">
@@ -82,7 +85,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 		</p>
           <p><i class="fa fa-home fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Leicester, UK</p>
           <p><i class="fa fa-envelope fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>venkykasprov@gmail.com</p>
-          <p><i class="fa fa-phone fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>+44 7767 957692</p>
+          <p><i class="fa fa-phone fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>+919994329789</p>
             <p id ="scroll-skill"><i class="fa fa-download fa-fw w3-margin-right w3-xxlarge w3-text-blue"> </i> <input class="btn" type="button" value="Download Resume" onclick="DownloadFile('Venky_resume.pdf')" /> </p>
 
          <hr>
@@ -93,12 +96,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
               <div class="p-2 bd-highlight"><img width="100px" height="30px"  src="static/r.svg"></div>
 
             </div>
-           <div class="d-flex flex-row bd-highlight mb-2">	
-		   <div class="p-2 bd-highlight"><img width="100px" height="30px"  src="static/azure.svg"></div>
-		   <div class="p-2 bd-highlight"> <span class="badge " style=" width:100px; height:30px" >  <img class=" p-1 bd-highlight  " src="static/sql.svg" > </span></div>
-            
-		</div>
-	   <div class="d-flex flex-row bd-highlight mb-2">
+			<div class="d-flex flex-row bd-highlight mb-2">
 				<div class="p-2 bd-highlight"><img  width="100px" height="30px" src="static/sklearn.svg" ></div>
               <div class="p-2 bd-highlight"><span class="badge bg-dark" style=" width:100px; height:30px"  > <div class="d-flex flex-row bd-highlight mb-3"> <div class=" p-2 bd-highlight text-warning"> Tensor</div> <div class=" p-2 bd-highlight text-white">Flow </div> </div> </span></div>
 
@@ -110,11 +108,14 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
             </div>
 			<div class="d-flex flex-row bd-highlight mb-2">
 				<div class="p-2 bd-highlight"> <img  width="100px" height="30px" src="static/js.svg" ></div>
-				 <div class="p-2 bd-highlight "> <span class="badge border-dark" ><img  width="100px" height="30px" src="static/mongodb.svg" > </span></div>
-              
+              <div class="p-2 bd-highlight"><img width="100px" height="30px"  src="static/azure.svg"></div>
 
             </div>
-           
+            <div class="d-flex flex-row bd-highlight mb-2">
+              
+              <div class="p-2 bd-highlight "> <span class="badge border-dark" ><img  width="100px" height="30px" src="static/mongodb.svg" > </span></div>
+              <div class="p-2 bd-highlight"> <span class="badge " style=" width:100px; height:30px" >  <img class=" p-1 bd-highlight  " src="static/sql.svg" > </span></div>
+            </div>
 
           </div>
 
@@ -148,34 +149,122 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
     </div>
 
     <!-- Right Column -->
+		<div id="mlModal" class="modal hide fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header bg-primary">
+						<h5 class="modal-title " style="color:white">Machine Learning Engineer</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 150px);">
+						<p>➢Worked as Machine Learning Engineer in Optumera pricing and promotion optimization using azure databricks.</p>
+						<p>➢ Coded using Python, Pyspark & SQL</p>
+						<p>➢ Analyzed various Time Series algorithms like Sarimax, Sarima, STL, FBprophet, Kats, Stldecompose for forecasting demand</p>
+						<p>➢ Conducted different types of regression analysis for calculation of unit price</p>
+						<p>➢ Imputed the final results based on different clustering approaches for the unpredictable scenarios</p>
+						<p>➢ Optimization of final results</p>
+					</div>
+					<div class="modal-footer bg-primary">
+						<h5 class="modal-title " style="color:white">2020 Mar-2022 Aug</h5>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="netModal" class="modal hide fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header bg-primary">
+						<h5 class="modal-title " style="color:white">Web Developer</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 150px);">
+						<p>➢ Worked in a .NET Support project for a German retailer's internal web application.</p>
+						<p>➢ Predominantly worked on support tickets on MS SQL.</p>
+						<p>➢ Very rarely involved on front end tickets like HTML, CSS & JS</p>
+						<p>➢ Resolving bugs using C# .NET coding in the application layer</p>
+					</div>
+					<div class="modal-footer bg-primary">
+						<h5 class="modal-title " style="color:white">2018 Jun-2020 Feb</h5>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="mastModal" class="modal hide fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header bg-primary">
+						<h5 class="modal-title " style="color:white">MSC Data Analysis For Business Intelligence</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 150px);">
+						<p>➢ Lot more on the way </p>
+					</div>
+					<div class="modal-footer bg-primary">
+						<h5 class="modal-title " style="color:white">2022 Sep-current</h5>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="bachModal" class="modal hide fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header bg-primary">
+						<h6 class="modal-title " style="color:white">B.E Electrical and Electronics Engineering</h6>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 150px);">
+						<p>➢ Passes with First Class</p>
+						<p>➢ Won Gold medal in zonal level chess competitions</p>
+						<p>➢ Worked on an agricultre drone in my final year project</p>
+						<p>➢ Organised several events like blood donation camps, tree plantation camps, ncc physical activities camps and so on as part of NCC (National Cadet Corps) Sri Sairam Engineering College initiatives</p>
+					</div>
+					<div class="modal-footer bg-primary">
+						<h5 class="modal-title " style="color:white">2014 Jul-2018 Apr</h5>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
     <div class="w3-twothird" id="scroll-exp-mob">
       <div class="w3-container w3-card w3-white w3-margin-bottom " >
         <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Work Experience</h2>
           <div class="container">
+		  
             <div class="row">
                 <div class="col-md-12">
                     <div class="main-timeline">
-
-                        <div class="timeline">
-                            <div class="timeline-content">
-                                <div class="timeline-year">2020 Mar-2022 Aug</div>
-                                <div class="timeline-icon"><i class="fa fa-cogs"></i></div>
-                                <h3 class="title">Tata Consultancy Services</h3>
-                                <p class="description">
-                                  Machine Learning Engineer
-                                </p>
-                            </div>
-                        </div>
-                        <div class="timeline" >
-                            <div class="timeline-content">
-                                <div class="timeline-year">2018 Jun-2020 Feb</div>
-                                <div class="timeline-icon" id="scroll-edu"><i class="fa fa-globe"></i></div>
-                                <h3 class="title">Tata Consultancy Services</h3>
-                                <p class="description">
-                                  Web Developer
-                                </p>
-                            </div>
-                        </div>
+						<div class="timeline" id="profile" >
+							<a href="#" onclick="loadMLModal();">
+								<div class="timeline-content">
+									<div class="timeline-year">2020 Mar-2022 Aug</div>
+									<div class="timeline-icon"><i class="fa fa-cogs"></i></div>
+									<h3 class="title">Tata Consultancy Services</h3>
+									<p class="description">
+									  Machine Learning Engineer
+									</p>
+								</div>
+							</a>
+						</div>	
+						<div class="timeline" id="profile">
+							<a href="#" onclick="loadNetModal();">
+								<div class="timeline-content">
+									<div class="timeline-year">2018 Jun-2020 Feb</div>
+									<div class="timeline-icon" id="scroll-edu"><i class="fa fa-globe"></i></div>
+									<h3 class="title">Tata Consultancy Services</h3>
+									<p class="description">
+									  Web Developer
+									</p>
+								</div>
+							</a>
+						</div>
                     </div>
                 </div>
             </div>
@@ -189,25 +278,29 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
             <div class="row">
                     <div class="col-md-12">
                         <div class="main-timeline">
-                            <div class="timeline">
-                                <div class="timeline-content">
-                                    <div class="timeline-year">2022 Sep-current</div>
-                                    <div class="timeline-icon"><i class="fa fa-university"></i></div>
-                                    <h3 class="title">University of Leicester</h3>
-                                    <p class="description">
-                                        MSC Data Analysis For Business Intelligence
-                                    </p>
-                                </div>
+                            <div class="timeline" id="profile">
+								<a href="#" onclick="loadMastModal();">
+									<div class="timeline-content">
+										<div class="timeline-year">2022 Sep-current</div>
+										<div class="timeline-icon"><i class="fa fa-university"></i></div>
+										<h3 class="title">University of Leicester</h3>
+										<p class="description">
+											MSC Data Analysis For Business Intelligence
+										</p>
+									</div>
+								</a>
                             </div>
-                            <div class="timeline">
-                                <div class="timeline-content">
-                                    <div class="timeline-year">2014 Jul-2018 Apr</div>
-                                    <div class="timeline-icon"><i class="fa fa-book"></i></div>
-                                    <h3 class="title">Sri Sairam Engineering College</h3>
-                                    <p class="description">
-                                      Bachelors of Engineering in Electrical and Electronics Engineering (B.E EEE)
-                                    </p>
-                                </div>
+                            <div class="timeline" id="profile">
+								<a href="#" onclick="loadBachModal();">
+									<div class="timeline-content">
+										<div class="timeline-year">2014 Jul-2018 Apr</div>
+										<div class="timeline-icon"><i class="fa fa-book"></i></div>
+										<h3 class="title">Sri Sairam Engineering College</h3>
+										<p class="description">
+										  Bachelors of Engineering in Electrical and Electronics Engineering (B.E EEE)
+										</p>
+									</div>
+								</a>
                             </div>
                         </div>
                     </div>
@@ -273,7 +366,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 
     <!-- End Right Column -->
     </div>
-
+	
   <!-- End Grid -->
   </div>
 
@@ -285,12 +378,27 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 
     $(function() {
   $(".typed").typed({
-    strings: ["Web Developer", "Machine Learning Engineer"],
+    strings: ["Web Developer", "Machine Learning Engineer", "AI Enthusiast","Chess Player"],
     typeSpeed: 0,loop: true
   });
 });
 </script>
+<script>
+function loadMLModal() {
+  $('#mlModal').removeClass("hide").modal('show');
+}
 
+function loadNetModal() {
+  $('#netModal').removeClass("hide").modal('show');
+}
+
+function loadMastModal() {
+  $('#mastModal').removeClass("hide").modal('show');
+}
+function loadBachModal() {
+  $('#bachModal').removeClass("hide").modal('show');
+}
+</script>
 <script>
 function openNav() {
   document.getElementById("mySidenav").style.width = "250px";

@@ -215,15 +215,28 @@
   top: 0;
 }
 
-.icon-advanced {
-    background: url('sklearn.svg');
-    background-size: cover; /* stretch the background to cover the whole element */
-
-    /* 
-       still inline, but has block features
-       meaning height and width can be set
-    */
-    display: inline-block;
-    height: 20px;
-    width: 20px;
+.mlmodel {
+  background-image: url(mlmodel.svg);
+  background-size:contain;
+  background-repeat: no-repeat;
+  height: 500px;
+}
+.net{
+ background-image: url(net.svg); 
+  background-size:contain;
+  background-repeat: no-repeat;
+  height: 500px;
+}
+.masters{
+ background-image: url(master.svg); 
+  background-size:contain;
+  background-repeat: no-repeat;
+  height: 500px;
+}
+.bachelors
+{
+ background-image: url(bachelor.svg); 
+  background-size:contain;
+  background-repeat: no-repeat;
+  height: 500px;
 }

@@ -4,11 +4,14 @@
 <title>Venky's Portfolio</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/x-icon" href="static/favicon.ico">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i,900,900i" type="text/css" media="all">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+          
 <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto'>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" media="all" href="static/w3.css">
@@ -18,39 +21,50 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 #profile:hover, #profile:focus{
     background: green;    
 }
- a { text-decoration: none; }
+
+    a { text-decoration: none; }
+	
+
+
 </style>
 </head>
-<body class="light-grey">
-<nav class="navbar navbar-expand-sm fixed-top bg-white w3-hide-small">
+<body style=" background:black">
+<nav class="navbar navbar-expand-sm fixed-top  w3-hide-small " style="background:#616161; opacity:0.9;">
   <div class="container-fluid">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="#">Experience</a>
+        <a class="text-white nav-link" href="#"> <h3 class="text-white"> √5 </h3></a>
+      </li>
+	 </ul>
+	 <ul class="navbar-nav justify-content-center ">
+	  <li class=" nav-item ">
+        <a class="text-white nav-link " href="#">Experience</a>
+      </li>
+	  <li class="nav-item ">
+        <a class="text-white nav-link" href="#scroll-skill">Skills</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#scroll-edu">Education</a>
+        <a class="text-white nav-link" href="#scroll-edu">Education</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#scroll-proj">Projects</a>
+      <li class="nav-item ">
+        <a class="text-white nav-link" href="#scroll-proj">Projects</a>
       </li>
-         <li class="nav-item">
-        <a class="nav-link" href="#scroll-skill">Skills</a>
-      </li>
+
     </ul>
   </div>
 </nav>
 
 
-<div class=" navbar topnav navbar-expand-sm bg-primary fixed-top w3-hide-large w3-hide-medium ">
+<div class=" navbar justify-content-center topnav navbar-expand-sm fixed-top w3-hide-medium w3-hide-large " style="background:#616161; opacity:0.7;">
+ <h3 class="text-white"> √5 </h3>
  <a href="#home" class="active"></a>
-  <div id="mySidenav" class="sidenav">
+  <div id="mySidenav" class="sidenav bg-dark">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <a href="#">Home</a>
    <a href="#scroll-exp-mob">Experience</a>
+      <a href="#scroll-skill">Skills</a>
     <a href="#scroll-edu-mob">Education</a>
     <a href="#scroll-proj">Projects</a>
-      <a href="#scroll-skill">Skills</a>
   </div>
     <div class="container-fluid bg-primary ">
          <a href="javascript:void(0);" class="icon" onclick="openNav()">
@@ -60,7 +74,8 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 
 </div>
 </br>
-</br>
+
+
 
 <!-- Page Container -->
 <div class="content margin-top" style="max-width:1400px;">
@@ -71,10 +86,11 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
     <!-- Left Column -->
     <div class="w3-third">
 
-      <div class="w3-white w3-text-grey w3-card-4">
+      <div class="bg-dark w3-text-white w3-card-4">
         <div class="w3-center w3-display-container">
+		  <br>
           <img class=" rounded-circle z-depth-2" alt="100x100" style="width:250px" src="static/profile.jpg" data-holder-rendered="true">
-          <div class=" w3-container w3-text-black">
+          <div class=" w3-container w3-text-white">
             <h2>Venkatasubramani Karthikeyan</h2>
           </div>
         </div>
@@ -85,62 +101,58 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 			<span class="typed"></span>
 		</p>
           <p><i class="fa fa-home fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Leicester, UK</p>
-          <p><i class="fa fa-envelope fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>venkykasprov@gmail.com</p>
-          <p><i class="fa fa-phone fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>+44 7767 957692</p>
+          <p onclick="sendEmail();"><i class="fa fa-envelope fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i><a href='mailto:venkykasprov@gmail.com?subject=I am extremely impressed by looking at your profile!&body=Hello! I got a chance to visit your profile!'>venkykasprov@gmail.com</a></p>
+          <p><i class="fa fa-phone fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i><a href="tel:+44 7767 957692">+44 7767 957692</a></p>
             <p id ="scroll-skill"><i class="fa fa-download fa-fw w3-margin-right w3-xxlarge w3-text-blue"> </i> <input class="btn bg-primary" style="color:white" type="button" value="Download Resume" onclick="DownloadFile('Venky_resume.pdf')" /> </p>
 
          <hr>
-          <p class="w3-large"><b><i class="fa fa-wrench  fa-fw w3-xxlarge w3-margin-right w3-text-blue"></i>Skills</b></p>
+          <h2 class="w3-text-white w3-padding-16"><b><i class="fa fa-wrench  fa-fw w3-xxlarge w3-margin-right w3-text-blue"></i>Skills</b></p>
           <div class="container">
-            <div class="d-flex flex-row bd-highlight mb-2">
-              <div class="p-2 bd-highlight"><img width="100px" height="30px"  src="static/python.svg"></div>
-              <div class="p-2 bd-highlight"><img width="100px" height="30px"  src="static/r.svg"></div>
-
+            <div class="d-flex flex-row bd-highlight mb-3">
+				<div class="p-3 bd-highlight "  data-bs-toggle="tooltip" data-bs-placement="top" title="Python">
+					<i style="font-size: 2em;" class="devicon-python-plain-wordmark colored"></i>
+				</div>
+				<div class="p-3 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="R programming">
+					<i style="font-size: 2em;" class="devicon-r-plain colored" ></i>
+				</div>
+			  <div class="p-3 bd-highlight"  data-bs-toggle="tooltip" data-bs-placement="top" title="TensorFLow"> <i style="font-size: 2em;" class="devicon-tensorflow-original-wordmark colored"></i></div>
+			  
             </div>
-			<div class="d-flex flex-row bd-highlight mb-2">
-				<div class="p-2 bd-highlight"><img  width="100px" height="30px" src="static/sklearn.svg" ></div>
-              <div class="p-2 bd-highlight"><span class="badge bg-dark" style=" width:100px; height:30px"  > <div class="d-flex flex-row bd-highlight mb-3"> <div class=" p-2 bd-highlight text-warning"> Tensor</div> <div class=" p-2 bd-highlight text-white">Flow </div> </div> </span></div>
-
-            </div>
-            <div class="d-flex flex-row bd-highlight mb-2">
-              <div class="p-2 bd-highlight"><img width="100px" height="30px"  src="static/html.svg"></div>
-              <div class="p-2 bd-highlight">  <img  width="100px" height="30px" src="static/css3.svg" ></div>
+			<div class="d-flex flex-row bd-highlight mb-3">
+			  
               
+			  <div class="p-3 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="HTML 5"> <i style="font-size: 2em;" class="devicon-html5-plain-wordmark colored"></i></div>
+              <div class="p-3 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="CSS 3"> <i style="font-size: 2em;" class="devicon-css3-plain-wordmark colored"></i></div>
+			  <div class="p-3 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Java Script"> <i style="font-size: 2em;"  class="devicon-javascript-plain colored"></i></div>
             </div>
-			<div class="d-flex flex-row bd-highlight mb-2">
-				<div class="p-2 bd-highlight"> <img  width="100px" height="30px" src="static/js.svg" ></div>
-              <div class="p-2 bd-highlight"><img width="100px" height="30px"  src="static/azure.svg"></div>
-
+            <div class="d-flex flex-row bd-highlight mb-3">
+              <div class="p-3 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Azure"> <i style="font-size: 2em;" class="devicon-azure-plain-wordmark colored"></i></div>
+              <div class="p-3 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Mongo DB"><i style="font-size: 2em;"  class="devicon-mongodb-plain-wordmark colored"></i></div>
+              <div class="p-3 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="SQL"><i  style="font-size: 2em;" class="devicon-postgresql-plain-wordmark colored"></i></div>
             </div>
-            <div class="d-flex flex-row bd-highlight mb-2">
-              
-              <div class="p-2 bd-highlight "> <span class="badge border-dark" ><img  width="100px" height="30px" src="static/mongodb.svg" > </span></div>
-              <div class="p-2 bd-highlight"> <span class="badge " style=" width:100px; height:30px" >  <img class=" p-1 bd-highlight  " src="static/sql.svg" > </span></div>
+		
+            <div class="d-flex flex-row bd-highlight mb-1">   
+		  <div class="p-1 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="SKLearn"> <img  width="70px" height="80px" src="static/sklearn.svg" ></div>
             </div>
 
           </div>
+		  
+		  
 
-                <hr>
-          <p class="w3-large w3-text-theme"><b><i class="fa fa-globe fa-fw w3-xxlarge w3-margin-right w3-text-blue"></i>Social Media</b></p>
-             <div class="w3-container">
-                 <div class="d-flex flex-row bd-highlight mb-4">
-              <div class="p-2 bd-highlight" > <a  target="_blank" href="https://www.instagram.com/__root5__"><i class=" fa fa-3x fa-instagram w3-hover-opacity" style="color:red;"> </i></a> </div>
-              <div class="p-2 bd-highlight "><a  width="100px" height="30px"  target="_blank" href="https://www.linkedin.com/in/vsroot5/"><i class=" fa fa-3x fa-linkedin w3-hover-opacity" style="color:blue;"></i></a> </div>
-              <div class="p-2 bd-highlight"><a  width="100px" height="30px"  target="_blank" href="https://www.twitter.com/__Root5__"><i class=" fa fa-3x fa-twitter w3-hover-opacity" style="color:blue;"></i></a> </div>
-              <div class="p-2 bd-highlight"><a  width="100px" height="30px"  target="_blank" href="https://github.com/venkatasubramani"><i class=" fa  fa-3x fa-github w3-hover-opacity" style="color:black;"></i></a> </div>
-            </div>
+                
+          
 
-             </div>
 
             <hr>
 
-             <p class="w3-large w3-text-theme"><b><i class="fa fa-hourglass fa-fw w3-xxlarge w3-margin-right w3-text-blue"></i>Hobbies</b></p>
-             <div class="w3-container">
+             <h2 class="w3-text-white w3-padding-16"><b><i class="fa fa-hourglass fa-fw w3-xxlarge w3-margin-right w3-text-blue"></i>Hobbies</b></p>
+             <div class="w3-container justify-content-center">
                  <div class="d-flex flex-row bd-highlight mb-4">
-             <div class="p-2 bd-highlight"><a  target="_blank" href="https://www.chess.com/member/venkykasprov" > <img  width="40px" height="50px" src="static/chess.png" >  </a></div>
+             
              <div class="p-2 bd-highlight"><a target="_blank" href="https://www.strava.com/athletes/100731210" > <img  width="40px" height="50px" src="static/strava2.webp" >   </a></div>
-             <div class="p-2 bd-highlight"><a target="_blank" href="https://www.youtube.com/channel/UCPZeM3gH_pccm5UuuO4r3-w" > <img   width="100%" height="70px" src="static/youtube.png" > </a></div>
-             <div class="p-2 bd-highlight"><a target="_blank" href="https://medium.com/@venkykasprov"> <img  width="40px" height="50px" src="static/medium.png" >   </a></div>
+			 <div class="p-2 bd-highlight"><a  target="_blank" href="https://www.chess.com/member/venkykasprov" > <img  width="40px" height="50px" src="static/chess.svg" >  </a></div>
+             <div class="p-2 bd-highlight"><a target="_blank" href="https://www.youtube.com/channel/UCPZeM3gH_pccm5UuuO4r3-w" > <img   width="40px%" height="50px" src="static/youtube.svg" > </a></div>
+             <div class="p-2 bd-highlight"><a target="_blank" href="https://medium.com/@venkykasprov"> <img  width="40px" height="50px" src="static/medium.svg" >   </a></div>
             </div>
              </div>
         </div>
@@ -153,11 +165,11 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 		<div id="mlModal" class="modal hide fade" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">
-					<div class="modal-header bg-primary">
+					<div class="modal-header bg-dark text-white" >
 						<h5 class="modal-title " style="color:white">Machine Learning Engineer</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
-					<div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 150px);">
+					<div class="modal-body text-light" style="background:#010101; opacity:0.7;overflow-y: auto; max-height: calc(100vh - 150px);">
 						<p>➢Worked as Machine Learning Engineer in Optumera pricing and promotion optimization using azure databricks.</p>
 						<p>➢ Coded using Python, Pyspark & SQL</p>
 						<p>➢ Analyzed various Time Series algorithms like Sarimax, Sarima, STL, FBprophet, Kats, Stldecompose for forecasting demand</p>
@@ -165,7 +177,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 						<p>➢ Imputed the final results based on different clustering approaches for the unpredictable scenarios</p>
 						<p>➢ Optimization of final results</p>
 					</div>
-					<div class="modal-footer bg-primary">
+					<div class="modal-footer bg-dark " >
 						<h5 class="modal-title " style="color:white">2020 Mar-2022 Aug</h5>
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					</div>
@@ -176,17 +188,17 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 		<div id="netModal" class="modal hide fade" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">
-					<div class="modal-header bg-primary">
-						<h5 class="modal-title " style="color:white">Web Developer</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<div class="modal-header  bg-dark text-white">
+						<h5 class="modal-title " style="color:white ">Web Developer</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
-					<div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 150px);">
+					<div class="modal-body text-light" style="background:#010101; opacity:0.7;overflow-y: auto; max-height: calc(100vh - 150px);">
 						<p>➢ Worked in a .NET Support project for a German retailer's internal web application.</p>
 						<p>➢ Predominantly worked on support tickets on MS SQL.</p>
 						<p>➢ Very rarely involved on front end tickets like HTML, CSS & JS</p>
 						<p>➢ Resolving bugs using C# .NET coding in the application layer</p>
 					</div>
-					<div class="modal-footer bg-primary">
+					<div class="modal-footer  bg-dark text-white">
 						<h5 class="modal-title " style="color:white">2018 Jun-2020 Feb</h5>
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					</div>
@@ -197,14 +209,14 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 		<div id="mastModal" class="modal hide fade" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">
-					<div class="modal-header bg-primary">
+					<div class="modal-header  bg-dark text-white">
 						<h5 class="modal-title " style="color:white">MSC Data Analysis For Business Intelligence</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
-					<div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 150px);">
+					<div class="modal-body text-light" style="background:#010101; opacity:0.7;overflow-y: auto; max-height: calc(100vh - 150px);">
 						<p>➢ Lot more on the way </p>
 					</div>
-					<div class="modal-footer bg-primary">
+					<div class="modal-footer  bg-dark text-white">
 						<h5 class="modal-title " style="color:white">2022 Sep-current</h5>
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					</div>
@@ -215,17 +227,17 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 		<div id="bachModal" class="modal hide fade" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">
-					<div class="modal-header bg-primary">
+					<div class="modal-header  bg-dark text-white">
 						<h6 class="modal-title " style="color:white">B.E Electrical and Electronics Engineering</h6>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
-					<div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 150px);">
+					<div class="modal-body text-light" style="background:#010101; opacity:0.7;overflow-y: auto; max-height: calc(100vh - 150px);">
 						<p>➢ Passes with First Class</p>
 						<p>➢ Won Gold medal in zonal level chess competitions</p>
 						<p>➢ Worked on an agricultre drone in my final year project</p>
 						<p>➢ Organised several events like blood donation camps, tree plantation camps, ncc physical activities camps and so on as part of NCC (National Cadet Corps) Sri Sairam Engineering College initiatives</p>
 					</div>
-					<div class="modal-footer bg-primary">
+					<div class="modal-footer  bg-dark text-white">
 						<h5 class="modal-title " style="color:white">2014 Jul-2018 Apr</h5>
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					</div>
@@ -235,8 +247,8 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 		
 		
     <div class="w3-twothird" id="scroll-exp-mob">
-      <div class="w3-container w3-card w3-white w3-margin-bottom " >
-        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Work Experience</h2>
+      <div class="w3-container w3-card bg-dark  w3-margin-bottom " >
+        <h2 class="w3-text-white w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Work Experience</h2>
           <div class="container">
 		  
             <div class="row">
@@ -246,7 +258,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 							<a href="#" onclick="loadMLModal();">
 								<div class="timeline-content">
 									<div class="timeline-year">2020 Mar-2022 Aug</div>
-									<div class="timeline-icon"><i class="fa fa-cogs"></i></div>
+									<div class="timeline-icon"><div class="p-1 bd-highlight" > <img src="static/mle.svg" width="50px" height="60px" ></div></div>
 									<h3 class="title">Tata Consultancy Services</h3>
 									<p class="description">
 									  Machine Learning Engineer
@@ -258,7 +270,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 							<a href="#" onclick="loadNetModal();">
 								<div class="timeline-content">
 									<div class="timeline-year">2018 Jun-2020 Feb</div>
-									<div class="timeline-icon" id="scroll-edu"><i class="fa fa-globe"></i></div>
+									<div class="timeline-icon"><div class="p-1 bd-highlight" > <img src="static/web.svg" width="50px" height="60px" ></div></div>
 									<h3 class="title">Tata Consultancy Services</h3>
 									<p class="description">
 									  Web Developer
@@ -272,8 +284,8 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
        </div>
       </div>
 
-      <div class="w3-container w3-card w3-white w3-margin-bottom" id="scroll-edu-mob" >
-        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-graduation-cap  fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Education</h2>
+      <div class="w3-container w3-card bg-dark  w3-margin-bottom" id="scroll-edu-mob" >
+        <h2 class="w3-text-white w3-padding-16"><i class="fa fa-graduation-cap  fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Education</h2>
 
         <div class="container">
             <div class="row">
@@ -283,7 +295,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 								<a href="#" onclick="loadMastModal();">
 									<div class="timeline-content">
 										<div class="timeline-year">2022 Sep-current</div>
-										<div class="timeline-icon"><i class="fa fa-university"></i></div>
+										<div class="timeline-icon"><div class="p-1 bd-highlight"> <img src="static/dabi.svg" width="50px" height="60px"> </div></div>
 										<h3 class="title">University of Leicester</h3>
 										<p class="description">
 											MSC Data Analysis For Business Intelligence
@@ -295,7 +307,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 								<a href="#" onclick="loadBachModal();">
 									<div class="timeline-content">
 										<div class="timeline-year">2014 Jul-2018 Apr</div>
-										<div class="timeline-icon"><i class="fa fa-book"></i></div>
+										<div class="timeline-icon"><div class="p-1 bd-highlight" > <img src="static/eee.svg" width="50px" height="60px" ></div></div>
 										<h3 class="title">Sri Sairam Engineering College</h3>
 										<p class="description">
 										  Bachelors of Engineering in Electrical and Electronics Engineering (B.E EEE)
@@ -309,8 +321,8 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
             </div>
       </div>
 
-        <div class="w3-container w3-card w3-white w3-margin-bottom" id="scroll-proj">
-            <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-file fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Projects</h2>
+        <div class="w3-container w3-card bg-dark  w3-margin-bottom" id="scroll-proj">
+            <h2 class="w3-text-white w3-padding-16"><i class="fa fa-file fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Projects</h2>
             <br>
             <div class="container">
                 <div class="card-group">
@@ -372,7 +384,22 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
   </div>
 
   <!-- End Page Container -->
+  
 </div>
+<br>
+<br>
+<br>
+<footer class="navbar justify-content-center fixed-bottom w3-center" style="background:#616161; opacity:0.7;">
+             <div class="w3-container ">
+                 <div class="d-flex ">
+              <div class="p-2 bd-highlight" > <a  target="_blank" href="https://www.instagram.com/__root5__"><i class=" fa fa-2x fa-instagram w3-hover-opacity" style="color:red;"> </i></a> </div>
+              <div class="p-2 bd-highlight "><a  target="_blank" href="https://www.linkedin.com/in/vsroot5/"><i class=" fa fa-2x fa-linkedin w3-hover-opacity" style="color:blue;"></i></a> </div>
+              <div class="p-2 bd-highlight"><a   target="_blank" href="https://www.twitter.com/__Root5__"><i class=" fa fa-2x fa-twitter w3-hover-opacity" style="color:blue;"></i></a> </div>
+              <div class="p-2 bd-highlight"><a   target="_blank" href="https://github.com/venkatasubramani"><i class=" fa  fa-2x fa-github w3-hover-opacity" style="color:white;"></i></a> </div>
+            </div>
+
+             </div>
+</footer>
  <script  src="static/layout.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/1.1.1/typed.min.js"></script>
 <script>
@@ -408,6 +435,17 @@ function openNav() {
 function closeNav() {
   document.getElementById("mySidenav").style.width = "0";
 }
+
+function sendEmail() 
+{
+    window.location = "mailto:xyz@yourapplicationdomain.com";
+}
+
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
 </script>
+
 </body>
 </html>

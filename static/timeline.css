@@ -79,12 +79,12 @@
     left: auto;
     right: 139px;
 }
-.main-timeline .timeline:nth-child(4n+2) .timeline-content:before{ background-color: #FF3E7D; }
-.main-timeline .timeline:nth-child(4n+2) .timeline-year{ color: #FF3E7D; }
-.main-timeline .timeline:nth-child(4n+3) .timeline-content:before{ background-color: #7338BA; }
-.main-timeline .timeline:nth-child(4n+3) .timeline-year{ color: #7338BA; }
-.main-timeline .timeline:nth-child(4n+4) .timeline-content:before{ background-color: #FF9800; }
-.main-timeline .timeline:nth-child(4n+4) .timeline-year{ color: #FF9800; }
+.main-timeline .timeline:nth-child(4n+2) .timeline-content:before{ background-color: #00A7FB; }
+.main-timeline .timeline:nth-child(4n+2) .timeline-year{ color: #00A7FB; }
+.main-timeline .timeline:nth-child(4n+3) .timeline-content:before{ background-color: #00A7FB; }
+.main-timeline .timeline:nth-child(4n+3) .timeline-year{ color: #00A7FB; }
+.main-timeline .timeline:nth-child(4n+4) .timeline-content:before{ background-color: #00A7FB; }
+.main-timeline .timeline:nth-child(4n+4) .timeline-year{ color: #00A7FB; }
 @media screen and (max-width:767px){
     .main-timeline .timeline,
     .main-timeline .timeline:nth-child(even){
@@ -166,7 +166,6 @@
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: blue;
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 60px;
@@ -176,13 +175,12 @@
   padding: 8px 8px 8px 32px;
   text-decoration: none;
   font-size: 25px;
-  color: blue;
   display: block;
   transition: 0.3s;
 }
 
 .sidenav a:hover {
-  color: black;
+  color: white;
 }
 
 .sidenav .closebtn {
@@ -203,16 +201,29 @@
 
 .topnav a {
   color: white;
-  padding: 14px 16px;
+  padding: 15px 15px;
   text-decoration: none;
   font-size: 17px;
   display: block;
 }
 
 .topnav a.icon {
-  background: blue;
+  background: 000000;
 
   position: absolute;
   right: 0;
   top: 0;
+}
+
+.icon-advanced {
+    background: url('sklearn.svg');
+    background-size: cover; /* stretch the background to cover the whole element */
+
+    /* 
+       still inline, but has block features
+       meaning height and width can be set
+    */
+    display: inline-block;
+    height: 20px;
+    width: 20px;
 }

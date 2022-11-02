@@ -16,8 +16,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" media="all" href="static/w3.css">
   <link rel="stylesheet" media="all" href="static/timeline.css">
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+ <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
+      defer
+    ></script>
 <style>
-html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
+html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif , margin:0;
+    padding:0;}
 #profile:hover, #profile:focus{
     background: green;    
 }
@@ -40,34 +46,48 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 	  <li class=" nav-item ">
         <a class="text-white nav-link " href="#scroll-exp">Experience</a>
       </li>
+	  <li class="nav-item">
+        <a class="text-white nav-link" href="#scroll-edu">Education</a>
+      </li>
 	  <li class="nav-item ">
         <a class="text-white nav-link" href="#scroll-skill">Skills</a>
       </li>
-      <li class="nav-item">
-        <a class="text-white nav-link" href="#scroll-edu">Education</a>
-      </li>
       <li class="nav-item ">
         <a class="text-white nav-link" href="#scroll-proj">Projects</a>
+      </li>
+	  <li class="nav-item ">
+        <a class="text-white nav-link" href="#scroll-vis">Visualisations</a>
       </li>
 
     </ul>
   </div>
 </nav>
 
+<div class="offcanvas  offcanvas-end text-white bg-dark" style="width:60%" id="demo">
+  <div class="offcanvas-header">
+    <h1 class="offcanvas-title"><a class="active" href="#" >Home</a></h1>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+  <div class="row"> 
+    <h1><a  href="#scroll-skill" >Skills</a></h1>
+	<h1><a  href="#scroll-exp-mob" >Experience</a></h1>
+    <h1><a  href="#scroll-edu-mob" >Education</a></h1>
+    <h1><a  href="#scroll-proj" >Projects</a></h1>
+	<h1><a  href="#scroll-vis" >Visualisations</a></h1>
+	
+</div>
+  </div>
+</div>
+
+
 
 <div class=" navbar justify-content-center topnav navbar-expand-sm fixed-top w3-hide-medium w3-hide-large " style="background:#616161; opacity:0.7;">
  <h3 class="text-white"> √5 </h3>
  <a href="#home" class="active"></a>
-  <div id="mySidenav" class="sidenav bg-dark">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="#">Home</a>
-   <a href="#scroll-exp-mob">Experience</a>
-      <a href="#scroll-skill">Skills</a>
-    <a href="#scroll-edu-mob">Education</a>
-    <a href="#scroll-proj">Projects</a>
-  </div>
+
     <div class="container-fluid bg-primary ">
-         <a href="javascript:void(0);" class="icon" onclick="openNav()">
+         <a href="javascript:void(0);" class="icon" data-bs-toggle="offcanvas" data-bs-target="#demo">
     <i class="fa fa-bars"></i>
   </a>
     </div>
@@ -405,10 +425,29 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
   <!-- End Page Container -->
   
 </div>
+
 <br>
 <br>
+  
+
+<div class="content margin-top"  style="max-width:1400px;" >
+	<div class="w3-container w3-card bg-dark  w3-margin-bottom" id="scroll-vis">
+		<h2 class="w3-text-white w3-padding-16"><i class="fa fa-line-chart fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Visualisations</h2>
+		<h5 class="w3-text-white w3-padding-16">Weekly Time management Sankey Diagram</h5>
+		 <div class="container flex-box flex-wrap">
+			<div id="sankey_basic" style="background: white	"></div>
+		</div>
+		<br>
+		<h5 class="w3-text-white w3-padding-16">Map</h5>
+		<div id="map_div" ></div>
+		<br>
+		<br>
+		<br>
+	</div>
+</div>
+
 <br>
-<footer class="navbar justify-content-center fixed-bottom w3-center" style="background:#616161; opacity:0.9;">
+<footer class="navbar justify-content-center fixed-bottom  w3-center" style="background:#616161; opacity:0.9;">
              <div class="w3-container ">
                  <div class="d-flex ">
               <div class="p-2 bd-highlight" > <a  target="_blank" href="https://www.instagram.com/__root5__"><i class=" fa fa-2x fa-instagram w3-hover-opacity" style="color:red;"> </i></a> </div>
@@ -421,6 +460,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 
              </div>
 </footer>
+
  <script  src="static/layout.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/1.1.1/typed.min.js"></script>
 <script>
@@ -450,22 +490,133 @@ function loadBachModal() {
 </script>
 <script>
 function openNav() {
-  document.getElementById("mySidenav").style.width = "250px";
+    document.getElementById("mySidenav").style.width = "250px";
+    document.getElementById("main").style.marginLeft = "250px";
 }
 
 function closeNav() {
-  document.getElementById("mySidenav").style.width = "0";
+    document.getElementById("mySidenav").style.width = "0";
+    document.getElementById("main").style.marginLeft= "0";
 }
 
 function sendEmail() 
 {
-    window.location = "mailto:xyz@yourapplicationdomain.com";
+    window.location = "mailto:venkykasprov@gmail.com";
 }
 
 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
   return new bootstrap.Tooltip(tooltipTriggerEl)
 })
+
+ google.charts.load('current', {
+      'packages': ['map','sankey'],
+      // Note: you will need to get a mapsApiKey for your project.
+      // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
+      'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+    });
+    google.charts.setOnLoadCallback(drawMap);
+	google.charts.setOnLoadCallback(drawChart);
+
+    function drawMap () {
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Address');
+      data.addColumn('string', 'Location');
+      data.addColumn('string', 'Marker')
+
+      data.addRows([
+        ['University of Leicester, Leicester, England, United Kingdom', 'Masters degree 2022-2023',   'green' ],
+		['Sri Sairam Engineering College, tambaram, Chennai, India', 'Bachelors degree 2014-2018',   'green' ],
+		['Dav Bhel School Ranipet, India', 'Schooling',   'green' ], 
+		['Tata consultancy services, Gandhinagar, India', 'ILP Training 2018',   'blue' ],
+		['Tata consultancy services, Sirusseri, chennai, India', '2018 - 2020 Worked as .NET Developer',   'blue' ],
+		['Tata consultancy services, magnum , chennai-2, India', '2020 - 2022 Worked as Machine Learning Engineer',   'blue' ]
+      
+      ]);
+      var url = 'https://icons.iconarchive.com/icons/icons-land/vista-map-markers/48/';
+
+      var options = {
+        zoomLevel: 2,
+        showTooltip: true,
+        showInfoWindow: true,
+        useMapTypeControl: true,
+        icons: {
+          blue: {
+            normal:   url + 'Map-Marker-Ball-Azure-icon.png',
+            selected: url + 'Map-Marker-Ball-Right-Azure-icon.png'
+          },
+          green: {
+            normal:   url + 'Map-Marker-Push-Pin-1-Chartreuse-icon.png',
+            selected: url + 'Map-Marker-Push-Pin-1-Right-Chartreuse-icon.png'
+          },
+          pink: {
+            normal:   url + 'Map-Marker-Ball-Pink-icon.png',
+            selected: url + 'Map-Marker-Ball-Right-Pink-icon.png'
+          }
+        }
+      };
+      var map = new google.visualization.Map(document.getElementById('map_div'));
+
+      map.draw(data, options);
+    }
+	
+	function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'From');
+        data.addColumn('string', 'To');
+        data.addColumn('number', 'Weight');
+        data.addRows([['Total hours in week', 'University', 14],
+ ['Total hours in week', 'Home', 109],
+ ['Total hours in week', 'Commute/Transport/Walk', 10],
+ ['Total hours in week', 'Part time', 20],
+ ['Total hours in week', 'Fun activities/playing/ movies', 10],
+ ['Total hours in week', 'Shopping', 5],
+ ['University', 'Data science Club', 1],
+ ['University', 'Mathematical Modelling', 4],
+ ['University', 'Linear statistics Models', 4],
+ ['University', 'Fundamentals of DataScience', 3],
+ ['University', 'Practical Programming', 2],
+ ['Mathematical Modelling', 'Classroom Session', 1],
+ ['Mathematical Modelling', 'Live Session', 2],
+ ['Mathematical Modelling', 'Feedback Session', 1],
+ ['Linear statistics Models', 'Classroom Session', 3],
+ ['Linear statistics Models', 'Feedback Session', 1],
+ ['Practical Programming', 'Workshop Session', 2],
+ ['Fundamentals of DataScience', 'Classroom Session', 1],
+ ['Fundamentals of DataScience', 'Workshop Session', 1],
+ ['Fundamentals of DataScience', 'Live Session', 1],
+ ['Home', 'Sleep', 56],
+ ['Home', 'Cooking', 20],
+ ['Home', 'Thinking to be productive', 33],
+ ['Thinking to be productive', 'Actually productive', 20],
+ ['Thinking to be productive', 'Literally wasting Time', 13],
+ ['Actually productive', 'Fundamentals of DataScience', 5],
+ ['Actually productive', 'Practical Programming', 5],
+ ['Actually productive', 'Mathematical Modelling', 5],
+ ['Actually productive', 'Linear statistics Models', 5]]);
+
+
+
+        // Sets chart options.
+        var options =  {
+    chartArea: {
+      // leave room for y-axis labels
+      width: '94%'
+    },
+    legend: {
+      position: 'top'
+    },
+    width: '100%', height: '500',
+	
+  };
+
+
+        // Instantiates and draws our chart, passing in some options.
+        var chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
+        chart.draw(data, options);
+      }
+	  
+
 </script>
 
 </body>

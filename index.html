@@ -438,8 +438,6 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif , margin:0;
 			<div id="sankey_basic" style="background: white	"></div>
 		</div>
 		<br>
-		<h5 class="w3-text-white w3-padding-16">Map</h5>
-		<div id="map_div" ></div>
 		<br>
 		<br>
 		<br>
@@ -515,51 +513,11 @@ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
       'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
     });
-    google.charts.setOnLoadCallback(drawMap);
+   
 	google.charts.setOnLoadCallback(drawChart);
 
-    function drawMap () {
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Address');
-      data.addColumn('string', 'Location');
-      data.addColumn('string', 'Marker')
-
-      data.addRows([
-        ['University of Leicester, Leicester, England, United Kingdom', 'Masters degree 2022-2023',   'green' ],
-		['Sri Sairam Engineering College, tambaram, Chennai, India', 'Bachelors degree 2014-2018',   'green' ],
-		['Dav Bhel School Ranipet, India', 'Schooling',   'green' ], 
-		['Tata consultancy services, Gandhinagar, India', 'ILP Training 2018',   'blue' ],
-		['1/G1, SIPCOT IT Park Navalur, Siruseri, Tamil Nadu 603103, India', '2018 - 2020 Worked as .NET Developer',   'blue' ],
-		['Tata consultancy services, magnum , chennai-2, India', '2020 - 2022 Worked as Machine Learning Engineer',   'blue' ]
-      
-      ]);
-      var url = 'https://icons.iconarchive.com/icons/icons-land/vista-map-markers/48/';
-
-      var options = {
-        zoomLevel: 2,
-        showTooltip: true,
-        showInfoWindow: true,
-        useMapTypeControl: true,
-        icons: {
-          blue: {
-            normal:   url + 'Map-Marker-Ball-Azure-icon.png',
-            selected: url + 'Map-Marker-Ball-Right-Azure-icon.png'
-          },
-          green: {
-            normal:   url + 'Map-Marker-Push-Pin-1-Chartreuse-icon.png',
-            selected: url + 'Map-Marker-Push-Pin-1-Right-Chartreuse-icon.png'
-          },
-          pink: {
-            normal:   url + 'Map-Marker-Ball-Pink-icon.png',
-            selected: url + 'Map-Marker-Ball-Right-Pink-icon.png'
-          }
-        }
-      };
-      var map = new google.visualization.Map(document.getElementById('map_div'));
-
-      map.draw(data, options);
-    }
-	
+    
+   
 	function drawChart() {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'From');

@@ -1,524 +1,158 @@
-<!DOCTYPE html >
-<html xmlns="http://www.w3.org/1999/html">
+<!doctype html>
+<html lang="en">
 <head>
-<title>Venky's Portfolio</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" type="image/x-icon" href="static/favicon.ico">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i,900,900i" type="text/css" media="all">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
-          
-<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto'>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" media="all" href="static/w3.css">
-  <link rel="stylesheet" media="all" href="static/timeline.css">
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
- <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQNhNje4_TyCSRB6tsyAxvRUvjikEVCqk&callback=initMap&v=weekly"
-      defer
-    ></script>
-<style>
-html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif , margin:0;
-    padding:0;}
-#profile:hover, #profile:focus{
-    background: green;    
-}
-
-    a { text-decoration: none; }
-	
-
-
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Venkatasubramani Karthikeyan | Portfolio</title>
+  <meta name="description" content="Portfolio of Venkatasubramani Karthikeyan - analytics-focused data professional." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+  <style>
+    :root { --bg:#05070d; --panel:#111827; --panel2:#0f172a; --text:#f8fafc; --muted:#94a3b8; --accent:#38bdf8; --accent2:#a78bfa; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin:0; background: radial-gradient(circle at top left, rgba(56,189,248,.18), transparent 35%), var(--bg); color:var(--text); font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    a { color: inherit; text-decoration: none; }
+    .navbar { backdrop-filter: blur(14px); background: rgba(5,7,13,.76)!important; border-bottom:1px solid rgba(148,163,184,.18); }
+    .brand-mark { color: var(--accent); font-weight: 800; letter-spacing:.08em; }
+    .hero { min-height: 92vh; display:flex; align-items:center; padding:7rem 0 4rem; }
+    .hero-card, .section-card, .metric-card, .project-card, .timeline-card { background: linear-gradient(145deg, rgba(17,24,39,.96), rgba(15,23,42,.88)); border:1px solid rgba(148,163,184,.18); border-radius:24px; box-shadow: 0 24px 80px rgba(0,0,0,.32); }
+    .hero-card { padding:2.5rem; }
+    .profile-orb { width:180px; height:180px; border-radius:50%; margin:auto; display:grid; place-items:center; background: radial-gradient(circle, var(--accent), var(--accent2)); color:#020617; font-size:4rem; font-weight:900; box-shadow: 0 0 80px rgba(56,189,248,.35); }
+    .eyebrow { color:var(--accent); text-transform:uppercase; letter-spacing:.18em; font-size:.8rem; font-weight:700; }
+    .headline { font-size:clamp(2.3rem, 6vw, 5rem); font-weight:900; line-height:.95; letter-spacing:-.06em; }
+    .muted { color:var(--muted); }
+    .type { color:var(--accent); border-right: 2px solid var(--accent); padding-right:4px; }
+    .btn-accent { background:linear-gradient(135deg,var(--accent),var(--accent2)); border:0; color:#020617; font-weight:700; }
+    .btn-outline-light { border-color:rgba(248,250,252,.28); }
+    section { padding:5rem 0; }
+    .section-title { font-size:2.25rem; font-weight:850; letter-spacing:-.04em; margin-bottom:1rem; }
+    .timeline-wrap { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:1rem; }
+    .timeline-card { padding:1.25rem; min-height:190px; position:relative; overflow:hidden; }
+    .timeline-card:before { content:""; position:absolute; inset:0 0 auto 0; height:4px; background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+    .metric-card { padding:1.5rem; text-align:center; height:100%; }
+    .metric-value { font-size:2rem; font-weight:900; color:var(--accent); }
+    .project-card { padding:1.3rem; height:100%; }
+    .project-card h5 { font-weight:800; }
+    .tag { display:inline-block; color:#bae6fd; background:rgba(14,165,233,.12); border:1px solid rgba(56,189,248,.25); border-radius:999px; padding:.32rem .7rem; margin:.16rem; font-size:.82rem; }
+    .skill-icon { font-size:2.4rem; margin:.6rem; color:var(--accent); }
+    .contact-box { padding:2rem; }
+    footer { padding:2rem 0; color:var(--muted); border-top:1px solid rgba(148,163,184,.16); }
+    .form-control, .form-control:focus { background:#020617; border-color:rgba(148,163,184,.35); color:var(--text); }
+  </style>
 </head>
-<body style=" background:black">
-<nav class="navbar navbar-expand-sm fixed-top  w3-hide-small " style="background:#616161; opacity:0.9;">
-  <div class="container-fluid">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="text-white nav-link" href="#"> <h3 class="text-white"> √5 </h3></a>
-      </li>
-	 </ul>
-	 <ul class="navbar-nav justify-content-center ">
-	  <li class=" nav-item ">
-        <a class="text-white nav-link " href="#scroll-exp">Experience</a>
-      </li>
-	  <li class="nav-item">
-        <a class="text-white nav-link" href="#scroll-edu">Education</a>
-      </li>
-	  <li class="nav-item ">
-        <a class="text-white nav-link" href="#scroll-skill">Skills</a>
-      </li>
-      <li class="nav-item ">
-        <a class="text-white nav-link" href="#scroll-proj">Projects</a>
-      </li>
-	  <li class="nav-item ">
-        <a class="text-white nav-link" href="#scroll-vis">Visualizations</a>
-      </li>
-
-    </ul>
-  </div>
-</nav>
-
-<div class="offcanvas  offcanvas-end text-white bg-dark" style="width:60%" id="demo">
-  <div class="offcanvas-header">
-    <h1 class="offcanvas-title"><a class="active" href="#" >Home</a></h1>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-  </div>
-  <div class="offcanvas-body">
-  <div class="row"> 
-    <h2><a  href="#scroll-skill" >Skills</a></h2>
-	<h2><a  href="#scroll-exp-mob" >Experience</a></h2>
-    <h2><a  href="#scroll-edu-mob" >Education</a></h2>
-    <h2><a  href="#scroll-proj" >Projects</a></h2>
-	<h2><a  href="#scroll-vis" >Visualizations</a></h2>
-	
-</div>
-  </div>
-</div>
-
-
-
-<div class=" navbar justify-content-center topnav navbar-expand-sm fixed-top w3-hide-medium w3-hide-large " style="background:#616161; opacity:0.7;">
- <h3 class="text-white"> √5 </h3>
- <a href="#home" class="active"></a>
-
-    <div class="container-fluid bg-primary ">
-         <a href="javascript:void(0);" class="icon" data-bs-toggle="offcanvas" data-bs-target="#demo">
-    <i class="fa fa-bars"></i>
-  </a>
+<body>
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark">
+    <div class="container">
+      <a class="navbar-brand brand-mark" href="#home">√5 Root5</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto gap-lg-3">
+          <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
+          <li class="nav-item"><a class="nav-link" href="#metrics">Metrics</a></li>
+          <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+          <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-</div>
-</br>
-</br>
-
-
-<!-- Page Container -->
-<div class="content margin-top" style="max-width:1400px;">
-
-  <!-- The Grid -->
-  <div class="w3-row-padding">
-
-    <!-- Left Column -->
-    <div class="w3-third">
-
-      <div class="bg-dark w3-text-white w3-card-4" >
-        <div class="w3-center w3-display-container">
-		  <br>
-          <img class=" rounded-circle z-depth-2" alt="100x100" style="background:black;width:250px" src="static/venky_bg.png" data-holder-rendered="true">
-          <div class=" w3-container w3-text-white">
-            <h2>Venkatasubramani Karthikeyan</h2>
+  <main id="home" class="hero">
+    <div class="container">
+      <div class="hero-card">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-4 text-center"><div class="profile-orb">√5</div></div>
+          <div class="col-lg-8">
+            <div class="eyebrow mb-3">Analytics • Data Engineering • Python</div>
+            <h1 class="headline">Venkatasubramani Karthikeyan</h1>
+            <h3 class="mt-4">I am a <span id="typewriter" class="type">Data Scientist</span></h3>
+            <p class="lead muted mt-4">Analytics-focused data professional building SQL-driven reporting workflows, analytical datasets, data pipelines, ML-powered solutions, and portfolio projects across healthcare, retail, enterprise search, chess, and financial analytics.</p>
+            <div class="d-flex flex-wrap gap-3 mt-4">
+              <a class="btn btn-accent btn-lg" href="static/root5_resume.pdf" target="_blank"><i class="fa fa-download me-2"></i>Download Resume</a>
+              <a class="btn btn-outline-light btn-lg" href="#projects"><i class="fa fa-diagram-project me-2"></i>View Projects</a>
+              <a class="btn btn-outline-light btn-lg" href="mailto:venkykasprov@gmail.com"><i class="fa fa-envelope me-2"></i>Contact</a>
+            </div>
           </div>
         </div>
-        <br>
-        <div class="w3-container" >
-          <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-xxlarge  w3-text-blue"></i>
-			<span class="typed"></span>
-		</p>
-          <p><i class="fa fa-home fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Leicester, UK</p>
-          <p onclick="sendEmail();"><i class="fa fa-envelope fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i><a href='mailto:venkykasprov@gmail.com?subject=I am extremely impressed by looking at your profile!&body=Hello! I got a chance to visit your profile!'>venkykasprov@gmail.com</a></p>
-          <p><i class="fa fa-phone fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i><a href="tel:+44 7767 957692">+44 7767 957692</a></p>
-            <p id ="scroll-skill"><i class="fa fa-download fa-fw w3-margin-right w3-xxlarge w3-text-blue"> </i> <input class="btn bg-primary" style="color:white" type="button" value="Download Resume" onclick="DownloadFile('Venky_resume.pdf')" /> </p>
+      </div>
+    </div>
+  </main>
 
-         <hr>
-          <h2 class="w3-text-white w3-padding-16"><b><i class="fa fa-wrench  fa-fw w3-xxlarge w3-margin-right w3-text-blue"></i>Skills</b></p>
-          <div class="container flex-box flex-wrap">
-           
-			
-            <div class="d-flex flex-row bd-highlight"  style="display: flex; justify-content: space-between; align-items: center;">
-				<div class="p-2 bd-highlight "  data-bs-toggle="tooltip" data-bs-placement="top" title="Python">
-					<i  class="devicon-python-plain-wordmark colored"></i>
-				</div>
-				<div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="R programming">
-					<i  class="devicon-r-plain colored" ></i>
-				</div>
-			  <div class="p-2 bd-highlight"  data-bs-toggle="tooltip" data-bs-placement="top" title="TensorFLow"> <i class="devicon-tensorflow-original colored" ></i></div>
-			  <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="HTML 5"> <i  class="devicon-html5-plain-wordmark colored"></i></div>
-			  <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="CSS 3"> <i class="devicon-css3-plain-wordmark colored"></i></div>
-            </div>
-			
-			<div class="d-flex flex-row bd-highlight logo-margin" style="display: flex; justify-content: space-between; align-items: center;">
-			  
-			  <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Java Script"> <i   class="devicon-javascript-plain colored logo-size"></i></div>
-			  <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Azure"> <i class="devicon-azure-plain colored"></i></div>
-              <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Mongo DB"><i   class="devicon-mongodb-plain-wordmark colored"></i></div>
-			 <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="SQL"><i class="devicon-postgresql-plain-wordmark colored"></i></div>
-			  <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="SKLearn"> <img  width="40px" height="25px" src="static/sklearn.svg" ></div>
-            </div>
-			
-            </div>
+  <section id="experience">
+    <div class="container">
+      <h2 class="section-title text-center">Experience and Education</h2>
+      <p class="text-center muted mb-5">A static GitHub Pages version of the timeline from the live Dash portfolio.</p>
+      <div class="timeline-wrap">
+        <div class="timeline-card"><i class="fa fa-graduation-cap fa-2x text-info mb-3"></i><h5>B.E. Electrical and Electronics Engineering</h5><p class="muted mb-1">2014 Jul - 2018 May</p><p>Anna University</p></div>
+        <div class="timeline-card"><i class="fa fa-briefcase fa-2x text-warning mb-3"></i><h5>Machine Learning Engineer</h5><p class="muted mb-1">2018 Jun - 2022 Aug</p><p>Tata Consultancy Services</p></div>
+        <div class="timeline-card"><i class="fa fa-graduation-cap fa-2x text-info mb-3"></i><h5>MSc Data Analysis for Business Intelligence</h5><p class="muted mb-1">2022 Sep - 2024 Jan</p><p>University of Leicester</p></div>
+        <div class="timeline-card"><i class="fa fa-briefcase fa-2x text-warning mb-3"></i><h5>Senior Data Engineer</h5><p class="muted mb-1">2024 Dec - 2025 May</p><p>Photon Interactive</p></div>
+        <div class="timeline-card"><i class="fa fa-briefcase fa-2x text-warning mb-3"></i><h5>Senior Data Analyst</h5><p class="muted mb-1">2025 Jun - Current</p><p>AstraZeneca</p></div>
+      </div>
+    </div>
+  </section>
 
-            <hr>
+  <section id="metrics">
+    <div class="container">
+      <h2 class="section-title text-center">GitHub and Chess.com Metrics</h2>
+      <div class="row g-4 mt-3">
+        <div class="col-md-3"><div class="metric-card"><i class="fa fa-code fa-2x mb-3"></i><div id="repos" class="metric-value">--</div><p class="muted">Public Repos</p></div></div>
+        <div class="col-md-3"><div class="metric-card"><i class="fa fa-users fa-2x mb-3"></i><div id="followers" class="metric-value">--</div><p class="muted">Followers</p></div></div>
+        <div class="col-md-3"><div class="metric-card"><i class="fa fa-chess-knight fa-2x mb-3"></i><div id="rapid" class="metric-value">--</div><p class="muted">Rapid Rating</p></div></div>
+        <div class="col-md-3"><div class="metric-card"><i class="fa fa-bolt fa-2x mb-3"></i><div id="blitz" class="metric-value">--</div><p class="muted">Blitz Rating</p></div></div>
+      </div>
+    </div>
+  </section>
 
-             <h2 class="w3-text-white w3-padding-16"><b><i class="fa fa-hourglass fa-fw w3-xxlarge w3-margin-right w3-text-blue"></i>Hobbies</b></p>
-             <div class="container flex-box flex-wrap">
-                 <div class="d-flex flex-row bd-highlight mb-4" style="display: flex; justify-content: space-between; align-items: center; ">
-             
-             <div class="p-2 bd-highlight"><a target="_blank" href="https://www.strava.com/athletes/100731210" > <img  width="40px" height="50px" src="static/strava2.webp" >   </a></div>
-			 <div class="p-2 bd-highlight"><a  target="_blank" href="https://www.chess.com/member/venkykasprov" > <img  width="40px" height="50px" src="static/chess.svg" >  </a></div>
-             <div class="p-2 bd-highlight"><a target="_blank" href="https://www.youtube.com/channel/UCPZeM3gH_pccm5UuuO4r3-w" > <img   width="40px%" height="50px" src="static/youtube.svg" > </a></div>
-             <div class="p-2 bd-highlight"><a target="_blank" href="https://medium.com/@venkykasprov"> <img  width="40px" height="50px" src="static/medium.svg" >   </a></div>
-            </div>
-             </div>
-			  <hr>
-			 <h2 class="w3-text-white w3-padding-16"><b><i class="fa fa-heart fa-fw w3-xxlarge w3-margin-right w3-text-blue"></i>Interests</b></p>
-			 <div class="container flex-box flex-wrap">
-			  <div class="d-flex flex-row bd-highlight mb-4" style="display: flex; justify-content: space-between; align-items: center; ">
-			  <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Deepmind"> <img  width="40px" height="50px" src="static/deepmind.svg" ></div>
-             <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Stock Market"> <img  width="40px" height="50px" src="static/stock.png" ></div>
-			 <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Crypto Currencies"> <img  width="40px" height="50px" src="static/crypto.png" ></div>
-			 <div class="p-2 bd-highlight" data-bs-toggle="tooltip" data-bs-placement="top" title="Chennai Super Kings"> <img  width="40px" height="50px" src="static/csk.svg" ></div>
-			  
-			  
-             
-            </div>
-			 </div>
-			 <hr>
+  <section id="projects">
+    <div class="container">
+      <h2 class="section-title text-center">Projects</h2>
+      <div class="row g-4 mt-3">
+        <div class="col-lg-4"><div class="project-card"><h5>Chess.com Dashboard</h5><p class="muted">Dashboard visualizing chess performance, openings, ratings, move behavior, and opponent trends.</p><a class="btn btn-sm btn-accent" href="https://github.com/venkatasubramani/chess_dot_com_dashboard" target="_blank">View Code</a> <a class="btn btn-sm btn-outline-light" href="https://root5-chess-dash.koyeb.app/" target="_blank">Demo</a></div></div>
+        <div class="col-lg-4"><div class="project-card"><h5>NLP PubMed Data</h5><p class="muted">NLP analysis and tag categorization of PubMed articles using traditional ML and transformer models.</p><a class="btn btn-sm btn-accent" href="https://github.com/venkatasubramani/pubmed-traditional-reccommendor-model/blob/main/nlp-dissertaion.ipynb" target="_blank">View Code</a></div></div>
+        <div class="col-lg-4"><div class="project-card"><h5>Stock Market Analysis</h5><p class="muted">Time-series analysis and forecasting workflows using Python, Pandas, PySpark, SARIMAX, and AutoETS.</p><a class="btn btn-sm btn-accent" href="https://github.com/venkatasubramani/Stock-market-data-analysis-using-python/blob/main/stock-market-data-analysis.ipynb" target="_blank">View Code</a> <a class="btn btn-sm btn-outline-light" href="https://medium.com/@venkykasprov/time-series-forecasting-a-comprehensive-analysis-using-various-models-for-stock-market-predictions-ad955b22960d" target="_blank">Blog</a></div></div>
+        <div class="col-lg-4"><div class="project-card"><h5>Labour Force Dashboard</h5><p class="muted">Plotly dashboard built with open UK labour-force data for exploratory analytics and forecasting.</p><a class="btn btn-sm btn-accent" href="https://github.com/venkatasubramani/LabourForceDashboard" target="_blank">View Code</a> <a class="btn btn-sm btn-outline-light" href="https://labour-force-dashboard.koyeb.app/" target="_blank">Demo</a></div></div>
+        <div class="col-lg-4"><div class="project-card"><h5>Financial Knowledge Graph</h5><p class="muted">Financial knowledge graph concept with Neo4j and data visualization.</p><span class="tag">Neo4j</span><span class="tag">Knowledge Graph</span><span class="tag">Finance</span></div></div>
+        <div class="col-lg-4"><div class="project-card"><h5>Cricbuzz Data Mining</h5><p class="muted">Web scraping and data mining of cricket statistics into MongoDB for player-profile analytics.</p><a class="btn btn-sm btn-accent" href="https://github.com/venkatasubramani/cricbuzz_data_mining/blob/main/cricbuzz_stats_data_mining.py" target="_blank">View Code</a> <a class="btn btn-sm btn-outline-light" href="https://medium.com/@venkykasprov/building-a-cricket-player-profile-database-with-web-scraping-and-mongodb-from-cricbuzz-website-0154156aca9e" target="_blank">Blog</a></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="container">
+      <h2 class="section-title text-center">Skills</h2>
+      <div class="section-card p-4 text-center mt-4">
+        <i class="devicon-python-plain-wordmark colored skill-icon"></i><i class="devicon-postgresql-plain-wordmark colored skill-icon"></i><i class="devicon-azure-plain colored skill-icon"></i><i class="devicon-mongodb-plain-wordmark colored skill-icon"></i><i class="devicon-javascript-plain colored skill-icon"></i><i class="devicon-html5-plain-wordmark colored skill-icon"></i><i class="devicon-css3-plain-wordmark colored skill-icon"></i>
+        <div class="mt-3"><span class="tag">SQL Transformation</span><span class="tag">Reporting Automation</span><span class="tag">PySpark</span><span class="tag">Databricks</span><span class="tag">Dash / Plotly</span><span class="tag">Forecasting</span><span class="tag">NLP</span><span class="tag">Azure AI Search</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <div class="section-card contact-box">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-6"><h2 class="section-title">Get in touch</h2><p class="muted">This static GitHub Pages version uses email links instead of a server-side contact form.</p><p><i class="fa fa-envelope me-2 text-info"></i><a href="mailto:venkykasprov@gmail.com">venkykasprov@gmail.com</a></p><div class="d-flex gap-3 fs-3"><a href="https://www.linkedin.com/in/vsroot5/" target="_blank"><i class="fab fa-linkedin"></i></a><a href="https://github.com/venkatasubramani" target="_blank"><i class="fab fa-github"></i></a><a href="https://www.kaggle.com/venkatasubramani" target="_blank">K</a><a href="https://www.instagram.com/__root5__" target="_blank"><i class="fab fa-instagram"></i></a></div></div>
+          <div class="col-lg-6"><form id="contactForm"><input class="form-control mb-3" id="name" placeholder="Your name" required /><input class="form-control mb-3" id="email" placeholder="Your email" type="email" required /><textarea class="form-control mb-3" id="message" rows="5" placeholder="Message" required></textarea><button class="btn btn-accent" type="submit">Open Email Client</button></form></div>
         </div>
       </div>
-
-    <!-- End Left Column -->
     </div>
+  </section>
 
-    <!-- Right Column -->
-		<div id="mlModal" class="modal hide fade" role="dialog">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header bg-dark text-white" >
-						<h5 class="modal-title " style="color:white">Machine Learning Engineer</h5>
-						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body text-white mlmodel" style=" overflow-y: auto; max-height: calc(100vh - 150px);">
-					<div class="w3-display-bottomleft w3-container " style=" font-size:11px; background:#616161; opacity:0.9;">
-						<div class="row">
-              <p>•	Seasoned Machine Learning Engineer proficient in Python, Pyspark, and SQL, specializing in Optumera pricing and promotion optimization on Azure Databricks.</p>
-              <p>•	Successfully optimized code runtime by migrating from pandas to Pyspark and SQL, achieving a remarkable threefold reduction in execution time.</p>
-              <p>•	Conducted comprehensive analysis using Time Series algorithms (Sarimax, Sarima, STL, FBprophet, Kats, and Stldecompose) for accurate demand forecasting.</p>
-              <p>•	Implemented diverse regression analysis techniques and advanced clustering approaches, ensuring precise unit price calculation and effective handling of unpredictable scenarios.</p>
-              <p>•	Demonstrated versatility by contributing to front-end tasks involving HTML, CSS, and JS, fostering a comprehensive understanding of the application's ecosystem. Additionally, actively engaged in regular client meetings, promoting effective collaboration, and consistently improving model accuracy from 30% to 90%.</p>
-              
-						</div>
-						</div>
-					</div>
-					<div class="modal-footer bg-dark " >
-						<h5 class="modal-title " style="color:white">2018 Jun-2022 Aug</h5>
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<div id="netModal" class="modal hide fade" role="dialog">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header  bg-dark text-white">
-						<h5 class="modal-title " style="color:white ">Data Analyst Student Intern</h5>
-						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body text-light net" style="overflow-y: auto; max-height: calc(100vh - 150px);">
-					<div class="w3-display-bottomleft w3-container " style=" font-size:12px; background:#616161; opacity:0.9;">
-						<div class="row">
-						<p>•	Conducted focused analysis on health, migration, and ethnicity aspects using census data, providing targeted insights in these areas.</p>
-            <p>•	Employed a diverse toolkit including Excel, Python, and Plotly for data manipulation, analysis, and visualization, enabling comprehensive exploration and effective communication of findings. </p>
-            <p>•	Initiated and facilitated data-focused conversations with key stakeholders involved in planning, service intervention, and practice, fostering informed decision-making and collaborative efforts for leveraging the insights gained from the census data.</p>
-             
-						</div>
-					</div>
-					</div>
-					<div class="modal-footer  bg-dark text-white">
-						<h5 class="modal-title " style="color:white">2022 Oct-2023 Feb</h5>
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<div id="mastModal" class="modal hide fade" role="dialog">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header  bg-dark text-white">
-						<h5 class="modal-title " style="color:white">MSC Data Analysis For Business Intelligence</h5>
-						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body text-light masters" style="overflow-y: auto; max-height: calc(100vh - 150px);">
-					<div class="w3-display-bottomleft w3-container " style=" font-size:12px; background:#616161; opacity:0.9;">
-						<div class="w3-row">
-              <p>➢ Active member of DataScience Club in University of Leicester</p>
-              <p>➢ Worked on multiple mini-projects and a main project</p>
-              <p>➢ Participated in a couple of Hackathons</p>
-						</div>
-					</div>
-					</div>
-					<div class="modal-footer  bg-dark text-white">
-						<h5 class="modal-title " style="color:white">2022 Sep- 2024 Jan </h5>
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<div id="bachModal" class="modal hide fade" role="dialog">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header  bg-dark text-white">
-						<h6 class="modal-title " style="color:white">B.E Electrical and Electronics Engineering</h6>
-						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body text-light bachelors" style="overflow-y: auto; max-height: calc(100vh - 150px);">
-					<div class="w3-display-bottomleft w3-container " style=" font-size:12px; background:#616161; opacity:0.9;">
-						<div class="w3-row">
-						<p>➢ Passes with First Class</p>
-						<p>➢ Won Gold medal in zonal level chess competitions</p>
-						<p>➢ Worked on an agricultre drone in my final year project</p>
-						<p>➢ Organised several events like blood donation camps, tree plantation camps, ncc physical activities camps and so on as part of NCC (National Cadet Corps) Sri Sairam Engineering College initiatives</p>
-						</div>
-					</div>
-					</div>
-					<div class="modal-footer  bg-dark text-white">
-						<h5 class="modal-title " style="color:white">2014 Jul-2018 Apr</h5>
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		
-    <div class="w3-twothird" id="scroll-exp-mob">
-      <div class="w3-container w3-card bg-dark  w3-margin-bottom " id="scroll-exp">
-        <h2 class="w3-text-white w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Work Experience</h2>
-          <div class="container">
-		  
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="main-timeline">
-                      <div class="timeline" id="profile">
-                        <a href="#" onclick="loadIntModal();" id="scroll-edu">
-                          <div class="timeline-content">
-                            <div class="timeline-year">2022 Oct-2023 Feb</div>
-                            <div class="timeline-icon"><div class="p-1 bd-highlight" > <img src="static/web.svg" width="50px" height="60px" ></div></div>
-                            <h3 class="title">University of Leicester</h3>
-                            <p class="description">
-                              Data Analyst, Student Intern (Part-time)
-                            </p>
-                          </div>
-                        </a>
-                      </div>
-                      <div class="timeline" id="profile" >
-                        <a href="#" onclick="loadMLModal();">
-                          <div class="timeline-content">
-                            <div class="timeline-year">2018 Jun-2022 Aug</div>
-                            <div class="timeline-icon"><div class="p-1 bd-highlight" > <img src="static/mle.svg" width="50px" height="60px" ></div></div>
-                            <h3 class="title">Tata Consultancy Services</h3>
-                            <p class="description">
-                              Machine Learning Engineer (Full-time)
-                              
-                            </p>
-                          </div>
-                        </a>
-                      </div>	
-						
-                    </div>
-                </div>
-            </div>
-       </div>
-      </div>
-
-      <div class="w3-container w3-card bg-dark  w3-margin-bottom" id="scroll-edu-mob" >
-        <h2 class="w3-text-white w3-padding-16"><i class="fa fa-graduation-cap  fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Education</h2>
-
-        <div class="container" >
-            <div class="row">
-                    <div class="col-md-12">
-                        <div class="main-timeline">
-                            <div class="timeline" id="profile">
-								<a href="#" onclick="loadMastModal();">
-									<div class="timeline-content">
-										<div class="timeline-year">2022 Sep-2024 Jan</div>
-										<div class="timeline-icon"><div class="p-1 bd-highlight"> <img src="static/dabi.svg" width="50px" height="60px"> </div></div>
-										<h3 class="title">University of Leicester</h3>
-										<p class="description">
-											MSC Data Analysis For Business Intelligence
-										</p>
-									</div>
-								</a>
-                            </div>
-                            <div class="timeline" id="profile">
-								<a href="#" onclick="loadBachModal();">
-									<div class="timeline-content">
-										<div class="timeline-year">2014 Jul-2018 Apr</div>
-										<div class="timeline-icon"><div class="p-1 bd-highlight" > <img src="static/eee.svg" width="50px" height="60px" ></div></div>
-										<h3 class="title">Sri Sairam Engineering College</h3>
-										<p class="description">
-										  Bachelors of Engineering in Electrical and Electronics Engineering (B.E EEE)
-										</p>
-									</div>
-								</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-      </div>
-
-        <div class="w3-container w3-card bg-dark  w3-margin-bottom" id="scroll-proj">
-            <h2 class="w3-text-white w3-padding-16"><i class="fa fa-file fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Projects</h2>
-            <br>
-            <div class="container">
-                <div class="card-group">
-                    <a href="#scroll-vis" class="card text-white mb-2 w3-hover-opacity" style="max-width: 27rem;">
-                      <div class="card-header bg-primary">Data Visualization using Python </div>
-                      <div class="card-body text-success">
-                        <h5 class="card-title">Plotly graphs </h5>
-                        <p class="card-text">Implemented few complex data visualizations</p>
-                      </div>
-                    </a>
-                    <a href="#scroll-chess" class="card text-white mb-2 w3-hover-opacity" style="max-width: 27rem;">
-                      <div class="card-header bg-primary">Chess.com Dashboard</div>
-                      <div class="card-body text-success">
-                        <h5 class="card-title">Plotly dashboard</h5>
-                        <p class="card-text"> Implemented a dashboard for my personal chess.com profile and hosted the data visualizations on a website</p>
-                      </div>
-                    </a>
-                </div>
-                <div class="card-group">
-                    <div class="card text-white mb-2 w3-hover-opacity" style="max-width: 27rem;">
-                      <div class="card-header bg-primary">Connect-four</div>
-                      <div class="card-body text-success">
-                        <h5 class="card-title">Reinforcement Learning</h5>
-                        <p class="card-text"> Two player game, The person who connects 4 will be a winner.</p>
-                      </div>
-                    </div>
-                    <div class="card text-white mb-2 w3-hover-opacity" style="max-width: 27rem;">
-                      <div class="card-header bg-primary">Stock market data analysis</div>
-                      <div class="card-body text-success">
-                        <h5 class="card-title">Data Analysis using Python/pyspark</h5>
-                        <p class="card-text"> Some basic data analysis using python, analysing the stock market data</p>
-                      </div>
-                    </div>
-                </div>
-                <div class="card-group">
-                    <div class="card text-white mb-2 w3-hover-opacity" style="max-width: 27rem;">
-                      <div class="card-header bg-primary">Portfolio old</div>
-                      <div class="card-body text-success">
-                        <h5 class="card-title">Python Flask</h5>
-                        <p class="card-text"> My old portfolio is coded with flask framework, with a chatbot </p>
-                      </div>
-                    </div>
-                    <div class="card text-white mb-2 w3-hover-opacity" style="max-width: 27rem;">
-                      <div class="card-header bg-primary">Portfolio new</div>
-                      <div class="card-body text-success">
-                        <h5 class="card-title">Static website hosted on Github pages</h5>
-                        <p class="card-text">This is my updated new portfolio</p>
-                      </div>
-                    </div>
-                </div>
-            </div>
-            </br>
-        </div>
-
-    <!-- End Right Column -->
-    </div>
-	
-  <!-- End Grid -->
-  </div>
-
-  <!-- End Page Container -->
-  
-</div>
-
-<br>
-<br>
-  
-
-<div class="content margin-top"  style="max-width:1400px;" >
-	<div class="w3-container w3-card bg-dark  w3-margin-bottom" >
-		<h2 class="w3-text-white w3-padding-16"><i class="fa fa-line-chart fa-fw w3-margin-right w3-xxlarge w3-text-blue"></i>Visualizations</h2>
-		<h5 class="w3-text-white w3-padding-16" id="scroll-vis">Data Visualization using Python</h5>
-		 <div  class="justify-content-center" style="overflow-x: auto;">
-			<iframe src="notebooks/data-visualization-in-python.html" style="width: 95%; margin: 0 auto; display: block;" height="600px" scrolling="yes"></iframe>
-			</div>
-		<br>
-    <!--<h5 class="w3-text-white w3-padding-16"id="scroll-chess">Chess.com Dashboard</h5>
-		 <div  class="justify-content-center" style="overflow-x: auto;">
-			<iframe src="https://chess-dot-com-dashboard.onrender.com" style="width: 95%; margin: 0 auto; display: block;" height="600px" scrolling="yes"></iframe>
-			</div> -->
-		<br>
-		<br>
-		<br>
-		<br>
-	</div>
-</div>
-
-<br>
-<footer class="navbar justify-content-center fixed-bottom  w3-center" style="background:#616161; opacity:0.9;">
-             <div class="w3-container ">
-                 <div class="d-flex ">
-              <div class="p-2 bd-highlight" > <a  target="_blank" href="https://www.instagram.com/__root5__"><i class=" fa fa-2x fa-instagram w3-hover-opacity" style="color:red;"> </i></a> </div>
-              <div class="p-2 bd-highlight "><a  target="_blank" href="https://www.linkedin.com/in/vsroot5/"><i class=" fa fa-2x fa-linkedin w3-hover-opacity" style="color:blue;"></i></a> </div>
-              <div class="p-2 bd-highlight"><a   target="_blank" href="https://www.twitter.com/__Root5__"><i class=" fa fa-2x fa-twitter w3-hover-opacity" style="color:blue;"></i></a> </div>
-              <div class="p-2 bd-highlight"><a   target="_blank" href="https://github.com/venkatasubramani"><i class=" fa  fa-2x fa-github w3-hover-opacity" style="color:white;"></i></a> </div>
-			  <div class="p-2 bd-highlight"><a   target="_blank" href="https://www.kaggle.com/venkatasubramani"><i class=" fa fa-2x  w3-hover-opacity" style="color:blue;">K</i></a> </div>
-			  
-            </div>
-
-             </div>
-</footer>
-
- <script  src="static/layout.js" ></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/1.1.1/typed.min.js"></script>
-<script>
-
-    $(function() {
-  $(".typed").typed({
-    strings: ["Machine Learning Engineer", "AI Enthusiast","Aspiring Data Scientist"],
-    typeSpeed: 250,loop: true
-  });
-});
-</script>
-<script>
-function loadMLModal() {
-  $('#mlModal').removeClass("hide").modal('show');
-}
-
-function loadIntModal() {
-  $('#netModal').removeClass("hide").modal('show');
-}
-
-function loadMastModal() {
-  $('#mastModal').removeClass("hide").modal('show');
-}
-function loadBachModal() {
-  $('#bachModal').removeClass("hide").modal('show');
-}
-</script>
-<script>
-function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-    document.getElementById("main").style.marginLeft = "250px";
-}
-
-function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-    document.getElementById("main").style.marginLeft= "0";
-}
-
-function sendEmail() 
-{
-    window.location = "mailto:venkykasprov@gmail.com";
-}
-
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-  return new bootstrap.Tooltip(tooltipTriggerEl)
-})
-
- 
-
-</script>
-
+  <footer><div class="container text-center">This portfolio is created by Venky ©2026 · Hosted free on GitHub Pages</div></footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const words = ["Analytics Engineer", "Python Developer", "Data Professional", "Machine Learning Engineer"];
+    let wordIndex = 0, charIndex = 0, deleting = false;
+    const el = document.getElementById('typewriter');
+    function typeLoop(){ const word = words[wordIndex]; el.textContent = word.slice(0,charIndex); if(!deleting && charIndex < word.length) charIndex++; else if(deleting && charIndex > 0) charIndex--; else { deleting = !deleting; if(!deleting) wordIndex = (wordIndex + 1) % words.length; } setTimeout(typeLoop, deleting ? 60 : 110); }
+    typeLoop();
+    fetch('https://api.github.com/users/venkatasubramani').then(r=>r.json()).then(d=>{ document.getElementById('repos').textContent=d.public_repos ?? 'N/A'; document.getElementById('followers').textContent=d.followers ?? 'N/A'; }).catch(()=>{});
+    fetch('https://api.chess.com/pub/player/venkykasprov/stats').then(r=>r.json()).then(d=>{ document.getElementById('rapid').textContent=d.chess_rapid?.last?.rating ?? 'N/A'; document.getElementById('blitz').textContent=d.chess_blitz?.last?.rating ?? 'N/A'; }).catch(()=>{});
+    document.getElementById('contactForm').addEventListener('submit', e => { e.preventDefault(); const name=document.getElementById('name').value; const email=document.getElementById('email').value; const msg=document.getElementById('message').value; const body=encodeURIComponent(`Hi Venky,\n\n${msg}\n\nFrom: ${name}\nEmail: ${email}`); window.location.href=`mailto:venkykasprov@gmail.com?subject=Portfolio enquiry&body=${body}`; });
+  </script>
 </body>
 </html>

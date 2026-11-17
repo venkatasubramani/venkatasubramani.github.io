@@ -16,6 +16,7 @@
 .filters,.panel,.metric{background:var(--panel);border:1px solid var(--line);border-radius:12px}.filters{display:flex;align-items:end;flex-wrap:wrap;gap:12px;padding:14px;margin-bottom:12px}.filters label{flex:1 1 130px;display:grid;gap:.28rem;font-size:.85rem;color:var(--muted)}button,select{min-height:40px;border:1px solid #697b68;border-radius:7px;background:var(--bg);color:var(--text);font:inherit;padding:.35rem .65rem}select{width:100%}button{cursor:pointer}button:hover:not(:disabled){border-color:var(--lime);color:var(--lime)}button:disabled{opacity:.55;cursor:default}.sync{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.sync p{font-size:.86rem;color:var(--muted)}.status{color:var(--muted);min-height:1.5rem;margin:0 0 10px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.metric{padding:14px}.metric span{display:block;color:var(--muted);font-size:.86rem}.metric strong{font-size:clamp(1.55rem,4vw,2.55rem);line-height:1.25;letter-spacing:-.055em}.grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px}.grid.equal{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{min-width:0;padding:18px;margin-bottom:12px}.panel h2{margin-bottom:4px}.caption{font-size:.86rem;color:var(--muted);margin-bottom:12px}.key{display:flex;flex-wrap:wrap;gap:6px 14px;margin:8px 0;color:var(--muted);font-size:.83rem}.key span{display:inline-flex;align-items:center;gap:.35rem}.dot{width:9px;height:9px;border-radius:50%;background:var(--mark)}canvas{display:block;width:100%;height:235px}details{margin-top:8px;color:var(--muted);font-size:.86rem}summary{cursor:pointer;width:fit-content}details .table-wrap{max-height:220px;margin-top:6px}.bar{display:flex;overflow:hidden;min-height:13px;background:#354337;border-radius:6px;margin:18px 0 10px}.bar span{flex-grow:var(--size);flex-basis:0;background:var(--mark)}.stats,.rank{padding:0;margin:0;list-style:none}.stats li,.rank li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.stats li:last-child,.rank li:last-child{border-bottom:0}.rank li{display:grid;grid-template-columns:1fr auto;row-gap:5px;font-size:.91rem}.rank meter{grid-column:1/-1;width:100%;height:8px}.rank meter::-webkit-meter-bar{border:0;border-radius:5px;background:#364337}.rank meter::-webkit-meter-optimum-value{background:#a4c96e}.rank meter::-moz-meter-bar{background:#a4c96e}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;text-align:left;font-size:.87rem}th,td{border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}th{color:var(--muted);font-weight:600}.pagination{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:12px;font-size:.87rem}.pagination button{font-size:.85rem}footer{padding:16px 0 34px;color:var(--muted);font-size:.88rem}footer a{margin-right:1rem}[hidden]{display:none!important}
 @media(max-width:730px){.grid,.grid.equal{grid-template-columns:1fr;gap:0}.hero{grid-template-columns:1fr auto}.board{width:100px;height:100px}.board img{width:56px;height:56px}}
 @media(max-width:475px){.shell{width:calc(100% - 26px)}.hero{grid-template-columns:1fr;padding:30px 0 22px}.board{display:none}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:12px}.filters label{flex-basis:120px}.filters button{flex:1}.pagination{justify-content:space-between}}
+ .insight-head{margin:24px 0 10px}.insight-head h2{font-size:1.65rem}.form-strip{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0}.form-strip span{display:grid;place-items:center;width:27px;height:27px;border-radius:5px;font:600 .78rem var(--mono);color:#141b16;background:var(--mark)}.split-row{margin:10px 0}.split-row .bar{margin:4px 0}.split-label{display:flex;justify-content:space-between;gap:6px;font-size:.87rem}.heat{table-layout:fixed;text-align:center}.heat th,.heat td{padding:4px 2px;white-space:normal}.heat td{border:2px solid var(--panel);border-radius:5px;font-size:.8rem;color:#f5f7ec;background:color-mix(in srgb,#507135 var(--heat),#253429)}.heat th:first-child{width:36px;text-align:left}.insight-filters{display:flex;align-items:end;flex-wrap:wrap;gap:8px;margin-bottom:6px}.insight-filters label{font-size:.84rem;color:var(--muted)}.insight-filters select{width:auto;margin-left:.4rem}.opening-table td:first-child{white-space:normal;min-width:115px}.opening-table .bar{min-width:78px;margin:0}.opening-table td,.opening-table th{padding:7px}.hint-space{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -61,6 +62,18 @@
     <div class="grid equal">
       <section class="panel" aria-labelledby="openings-title"><h2 id="openings-title">Most played openings</h2><p class="caption">Top five by game count.</p><ol class="rank" id="openings"></ol></section>
       <section class="panel" aria-labelledby="countries-title"><h2 id="countries-title">Opponent countries</h2><p class="caption">Top five by game count where country was recorded.</p><ol class="rank" id="countries"></ol></section>
+    </div>
+    <div class="insight-head"><h2>Performance breakdown</h2><p class="caption">All insights reflect the filters above.</p></div>
+    <div class="grid equal">
+      <section class="panel"><h2>Recent form</h2><p class="caption" id="formSummary"></p><div class="form-strip" id="formStrip" aria-hidden="true"></div><p class="caption hint-space">Oldest → newest · W win · D draw · L loss</p></section>
+      <section class="panel"><h2>Results by format and colour</h2><p class="caption">Win rate uses all games in each group. Bars show wins, draws and losses.</p><div id="splits"></div></section>
+    </div>
+    <div class="grid equal">
+      <section class="panel"><h2>When I play</h2><p class="caption">Number of games by finish time (UTC). Column labels mark the start of each three-hour window.</p><table class="heat"><thead><tr><th scope="col">Day</th><th scope="col">00</th><th scope="col">03</th><th scope="col">06</th><th scope="col">09</th><th scope="col">12</th><th scope="col">15</th><th scope="col">18</th><th scope="col">21</th></tr></thead><tbody id="heat"></tbody></table></section>
+      <section class="panel"><h2>Opening performance</h2><p class="caption">Openings with at least 10 games in this selection. A draw counts as half a point in the score.</p>
+        <div class="insight-filters"><label>Order by<select id="openingOrder"><option value="volume">Most played</option><option value="best">Highest score</option><option value="worst">Lowest score</option></select></label></div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Opening performance"><table class="opening-table"><thead><tr><th scope="col">Opening</th><th scope="col">Games</th><th scope="col">W–D–L</th><th scope="col">Score</th></tr></thead><tbody id="openingPerformance"></tbody></table></div>
+      </section>
     </div>
     <section class="panel" aria-labelledby="recent-title">
       <h2 id="recent-title">Game archive</h2><p class="caption">Newest first. Open a game to review it on Chess.com.</p>
@@ -237,6 +250,108 @@ function renderPage() {
   get('next').disabled = first + pageSize >= selected.length;
 }
 
+function recordLine(counts) {
+  return counts.map(value => integer.format(value)).join('–');
+}
+
+function outcomeBar(counts) {
+  const bar = element('div');
+  bar.className = 'bar';
+  bar.setAttribute('aria-hidden','true');
+  for (const [index,count] of counts.entries()) {
+    const segment = element('span');
+    segment.style.setProperty('--size',count);
+    segment.style.setProperty('--mark',resultPalette[index]);
+    bar.append(segment);
+  }
+  return bar;
+}
+
+function insightStats(games) {
+  const formats = names.map(() => [0,0,0]);
+  const sides = colours.map(() => [0,0,0]);
+  const heat = Array.from({length:7},() => Array(8).fill(0));
+  const openings = new Map();
+  let longest = 0, streak = 0;
+  for (const [date,format,side,result,,opening] of games) {
+    formats[format][result]++;
+    sides[side][result]++;
+    const instant = new Date(date.replace(' ','T') + 'Z');
+    heat[(instant.getUTCDay() + 6) % 7][Math.floor(instant.getUTCHours() / 3)]++;
+    if (!openings.has(opening)) openings.set(opening,[0,0,0]);
+    openings.get(opening)[result]++;
+    streak = result === 0 ? streak + 1 : 0;
+    longest = Math.max(longest,streak);
+  }
+  return {formats,sides,heat,openings,longest};
+}
+
+const sum = values => values.reduce((total,value) => total + value,0);
+let openingStats = new Map();
+
+function renderOpeningPerformance() {
+  const scores = [...openingStats].map(([id,counts]) => {
+    const games = sum(counts);
+    return {name:archive.openings[id],counts,games,score:(counts[0] + counts[1] / 2) / games};
+  }).filter(entry => entry.name !== 'Unknown' && entry.games >= 10);
+  const order = get('openingOrder').value;
+  scores.sort((a,b) => (order === 'best' ? b.score - a.score : order === 'worst' ? a.score - b.score : 0) ||
+    b.games - a.games || a.name.localeCompare(b.name));
+  const rows = scores.slice(0,6).map(entry => {
+    const item = row([entry.name,integer.format(entry.games),recordLine(entry.counts),percentage.format(entry.score)]);
+    item.cells[2].append(outcomeBar(entry.counts));
+    return item;
+  });
+  if (!rows.length) {
+    const empty = row(['No openings meet the 10-game minimum.']);
+    empty.cells[0].colSpan = 4;
+    rows.push(empty);
+  }
+  get('openingPerformance').replaceChildren(...rows);
+}
+
+function renderInsights() {
+  const stats = insightStats(selected);
+  const recent = selected.slice(0,20).reverse();
+  const counts = [0,0,0];
+  get('formStrip').replaceChildren(...recent.map(game => {
+    const outcome = game[3];
+    counts[outcome]++;
+    const mark = element('span',['W','D','L'][outcome]);
+    mark.style.setProperty('--mark',resultPalette[outcome]);
+    return mark;
+  }));
+  get('formSummary').textContent = recent.length ?
+    'Last ' + recent.length + ' games: ' + recordLine(counts) + ' (W–D–L). Longest win streak in selection: ' + integer.format(stats.longest) + '.' :
+    'No games match these filters.';
+  const groups = [...names,...colours].map((label,index) => {
+    const values = [...stats.formats,...stats.sides][index];
+    const total = sum(values);
+    if (!total) return null;
+    const item = element('div'), line = element('div');
+    item.className = 'split-row';
+    line.className = 'split-label';
+    line.append(element('strong',label),element('span',percentage.format(values[0] / total) + ' wins · ' + recordLine(values)));
+    item.append(line,outcomeBar(values));
+    return item;
+  }).filter(Boolean);
+  get('splits').replaceChildren(...(groups.length ? groups : [element('p','No games match these filters.')]));
+  const max = Math.max(1,...stats.heat.flat());
+  get('heat').replaceChildren(...stats.heat.map((values,index) => {
+    const item = element('tr'), label = element('th',['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][index]);
+    label.scope = 'row';
+    item.append(label);
+    for (const count of values) {
+      const cell = item.insertCell();
+      cell.textContent = integer.format(count);
+      cell.style.setProperty('--heat',Math.round(Math.sqrt(count / max) * 100) + '%');
+    }
+    return item;
+  }));
+  openingStats = stats.openings;
+  renderOpeningPerformance();
+}
+
 function filter() {
   const [format, colour, year] = controls.map(control => control.value);
   selected = archive.games.filter(row => (!format || row[1] === Number(format)) &&
@@ -266,6 +381,7 @@ function filter() {
   rank('countries',stats.countries,archive.countries);
   page = 0;
   renderRating();
+  renderInsights();
   renderPage();
 }
 
@@ -433,6 +549,7 @@ async function initialize() {
       for (const control of controls) control.value = '';
       filter();
     });
+    get('openingOrder').addEventListener('change',renderOpeningPerformance);
     get('previous').addEventListener('click',() => { page--; renderPage(); });
     get('next').addEventListener('click',() => { page++; renderPage(); });
     get('dashboard').hidden = false;

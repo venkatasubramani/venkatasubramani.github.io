@@ -319,6 +319,33 @@ function updateYears() {
   select.value = years.includes(value) ? value : '';
 }
 
+function storedRefresh(record) {
+  return new Promise((resolve,reject) => {
+    const open = indexedDB.open('chess-dashboard',1);
+    open.onupgradeneeded = () => open.result.createObjectStore('archives');
+    open.onerror = () => reject(open.error);
+    open.onblocked = () => reject(new Error('Browser storage is blocked.'));
+    open.onsuccess = () => {
+      const db = open.result;
+      try {
+        const tx = db.transaction('archives',record ? 'readwrite' : 'readonly');
+        const store = tx.objectStore('archives');
+        const operation = record ? store.put(record,account) : store.get(account);
+        tx.oncomplete = () => { db.close(); resolve(operation.result); };
+        tx.onabort = () => { db.close(); reject(tx.error || new Error('Browser storage transaction failed.')); };
+      } catch (error) {
+        db.close();
+        reject(error);
+      }
+    };
+  });
+}
+
+function showRefreshSource(refreshedAt) {
+  get('source').textContent = 'Sources: Chess.com PubAPI and saved archive fields. Last successful refresh: ' +
+    new Date(refreshedAt).toLocaleString() + '.';
+}
+
 async function syncChess() {
   const button = get('sync');
   button.disabled = true;
@@ -362,10 +389,17 @@ async function syncChess() {
     archive = {openings,countries,opponents,games};
     updateYears();
     filter();
-    status.textContent = 'Refreshed ' + integer.format(months.length) + ' monthly archives from Chess.com. ' +
+    const refreshedAt = Date.now();
+    showRefreshSource(refreshedAt);
+    const summary = 'Refreshed ' + integer.format(months.length) + ' monthly archives from Chess.com. ' +
       (added ? integer.format(added) + ' new games found.' : 'No new games found.');
-    get('source').textContent = 'Sources: Chess.com PubAPI and saved archive fields. Last successful refresh: ' +
-      new Date().toLocaleString() + '.';
+    try {
+      await storedRefresh({version:1,refreshedAt,archive});
+      status.textContent = summary + ' Saved in this browser.';
+    } catch (error) {
+      status.textContent = summary + ' Browser storage was unavailable, so reloading may restore older data.';
+      console.warn('Chess.com refresh storage:',error.message);
+    }
   } catch (error) {
     status.textContent = 'Chess.com refresh was unavailable. The games already loaded are still shown. You can try again.';
     console.warn('Chess.com refresh:',error.message);
@@ -379,6 +413,17 @@ async function initialize() {
     const packed = Uint8Array.from(atob(get('archive').textContent.trim()), letter => letter.charCodeAt(0));
     archive = await new Response(new Blob([packed]).stream().pipeThrough(new DecompressionStream('gzip'))).json();
     snapshot = archive;
+    try {
+      const saved = await storedRefresh();
+      if (saved?.version === 1 && Number.isFinite(saved.refreshedAt) &&
+          ['games','openings','countries','opponents'].every(field => Array.isArray(saved.archive?.[field]))) {
+        archive = saved.archive;
+        showRefreshSource(saved.refreshedAt);
+        get('syncStatus').textContent = 'Showing the last Chess.com refresh saved in this browser.';
+      }
+    } catch (error) {
+      console.warn('Chess.com saved archive:',error.message);
+    }
     updateYears();
     get('sync').disabled = false;
     get('sync').addEventListener('click',syncChess);

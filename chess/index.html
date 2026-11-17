@@ -85,7 +85,7 @@ const percentage = new Intl.NumberFormat('en-IN', {style:'percent',maximumFracti
 const monthDate = new Intl.DateTimeFormat('en', {month:'short',year:'numeric',timeZone:'UTC'});
 const pageSize = 10;
 const controls = ['format', 'colour', 'year'].map(get);
-let archive, snapshotEnd, selected = [], timeline = [], page = 0;
+let archive, snapshot, selected = [], timeline = [], page = 0;
 
 function element(tag, value) {
   const node = document.createElement(tag);
@@ -271,24 +271,24 @@ function filter() {
 
 const account = 'venkykasprov';
 const gamesEndpoint = 'https://api.chess.com/pub/player/' + account + '/games';
-const fetchedMonths = new Map();
 
 async function getPublicData(url) {
   const response = await fetch(url, {
     credentials:'omit',
+    cache:'no-store',
     signal:AbortSignal.timeout(15000)
   });
   if (!response.ok) throw new Error('Chess.com returned HTTP ' + response.status + '.');
   return response.json();
 }
 
-function archiveMonths(payload, firstMonth, currentMonth) {
+function archiveMonths(payload, currentMonth) {
   if (!Array.isArray(payload.archives)) throw new Error('Invalid archive list.');
   return [...new Set(payload.archives.map(url => {
     if (typeof url !== 'string' || !url.startsWith(gamesEndpoint + '/')) return '';
     const month = url.slice(gamesEndpoint.length + 1);
     return /^\d{4}\/(0[1-9]|1[0-2])$/.test(month) ? month : '';
-  }).filter(month => month && month >= firstMonth && month <= currentMonth))].sort();
+  }).filter(month => month && month <= currentMonth))].sort();
 }
 
 function normalizedGame(game) {
@@ -325,12 +325,13 @@ async function syncChess() {
   const status = get('syncStatus');
   status.textContent = 'Checking Chess.com for new games…';
   try {
-    const firstMonth = snapshotEnd.slice(0,7).replace('-','/');
     const currentMonth = new Date().toISOString().slice(0,7).replace('-','/');
-    const months = archiveMonths(await getPublicData(gamesEndpoint + '/archives'), firstMonth, currentMonth);
-    if (!months.length) throw new Error('No recent archive months were available.');
-    const known = new Set(archive.games.map(game => game[8]));
-    const openings = [...archive.openings], countries = [...archive.countries], opponents = [...archive.opponents];
+    const months = archiveMonths(await getPublicData(gamesEndpoint + '/archives'), currentMonth);
+    if (!months.length) throw new Error('No archive months were available.');
+    const previousIds = new Set(archive.games.map(game => game[8]));
+    const savedRows = new Map(snapshot.games.map(game => [game[8],game]));
+    const coveredMonths = new Set(months.map(month => month.replace('/','-')));
+    const openings = [...snapshot.openings], countries = [...snapshot.countries], opponents = [...snapshot.opponents];
     const lookup = labels => {
       const index = new Map(labels.map((value,i) => [value,i]));
       return value => {
@@ -339,31 +340,32 @@ async function syncChess() {
       };
     };
     const openingIndex = lookup(openings), countryIndex = lookup(countries), opponentIndex = lookup(opponents);
-    const additions = [];
+    const refreshed = new Map();
     for (const [index,month] of months.entries()) {
-      status.textContent = 'Checking Chess.com archives (' + (index + 1) + ' of ' + months.length + ')…';
-      let games = month === currentMonth ? undefined : fetchedMonths.get(month);
-      if (!games) {
-        const payload = await getPublicData(gamesEndpoint + '/' + month);
-        if (!Array.isArray(payload.games)) throw new Error('Invalid monthly archive.');
-        games = payload.games.map(normalizedGame).filter(Boolean);
-        if (month !== currentMonth) fetchedMonths.set(month,games);
-      }
-      for (const game of games) {
-        if (known.has(game.id) || game.date <= snapshotEnd) continue;
-        known.add(game.id);
-        additions.push([game.date,game.format,game.colour,game.result,game.rating,
-          openingIndex(game.opening),countryIndex('Unknown'),opponentIndex(game.opponent),game.id,null,null]);
+      status.textContent = 'Refreshing Chess.com archives (' + (index + 1) + ' of ' + months.length + ')…';
+      const payload = await getPublicData(gamesEndpoint + '/' + month);
+      if (!Array.isArray(payload.games)) throw new Error('Invalid monthly archive.');
+      for (const game of payload.games) {
+        const normalized = normalizedGame(game);
+        if (!normalized) continue;
+        const {id,date,format,colour,result,rating,opening,opponent} = normalized;
+        const saved = savedRows.get(id);
+        refreshed.set(id,[date,format,colour,result,rating,
+          opening === 'Unknown' && saved ? saved[5] : openingIndex(opening),
+          saved?.[6] ?? countryIndex('Unknown'),opponentIndex(opponent),id,saved?.[9] ?? null,saved?.[10] ?? null]);
       }
     }
-    archive = {openings,countries,opponents,
-      games:[...archive.games,...additions].sort((a,b) => b[0].localeCompare(a[0]))};
+
+    const retained = snapshot.games.filter(game => !coveredMonths.has(game[0].slice(0,7)) && !refreshed.has(game[8]));
+    const games = [...retained,...refreshed.values()].sort((a,b) => b[0].localeCompare(a[0]));
+    const added = games.filter(game => !previousIds.has(game[8])).length;
+    archive = {openings,countries,opponents,games};
     updateYears();
     filter();
-    status.textContent = additions.length ? integer.format(additions.length) + ' new games loaded from Chess.com.' :
-      'Chess.com checked. No new supported games were found.';
-    get('source').textContent = 'Sources: saved game archive through May 2023 and Chess.com PubAPI. Latest game shown in the full archive: ' +
-      archive.games[0][0].slice(0,10) + ' (UTC).';
+    status.textContent = 'Refreshed ' + integer.format(months.length) + ' monthly archives from Chess.com. ' +
+      (added ? integer.format(added) + ' new games found.' : 'No new games found.');
+    get('source').textContent = 'Sources: Chess.com PubAPI and saved archive fields. Last successful refresh: ' +
+      new Date().toLocaleString() + '.';
   } catch (error) {
     status.textContent = 'Chess.com refresh was unavailable. The games already loaded are still shown. You can try again.';
     console.warn('Chess.com refresh:',error.message);
@@ -376,7 +378,7 @@ async function initialize() {
   try {
     const packed = Uint8Array.from(atob(get('archive').textContent.trim()), letter => letter.charCodeAt(0));
     archive = await new Response(new Blob([packed]).stream().pipeThrough(new DecompressionStream('gzip'))).json();
-    snapshotEnd = archive.games[0][0];
+    snapshot = archive;
     updateYears();
     get('sync').disabled = false;
     get('sync').addEventListener('click',syncChess);

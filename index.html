@@ -111,10 +111,10 @@
       .shell { width: calc(100% - 40px); }
       .section { padding: 46px 0; }
     }
-    @media (max-width: 560px) {
-      html { scroll-padding-top: 104px; }
+    @media (max-width: 760px) {
+      html { scroll-padding-top: 125px; }
       .nav { row-gap: 8px; min-height: 0; padding: 10px 0; }
-      .nav-links { width: 100%; justify-content: space-between; }
+      .nav-links { width: 100%; justify-content: flex-start; gap: 8px 16px; }
       .shell { width: calc(100% - 30px); }
       .hero { padding-top: 34px; padding-bottom: 32px; }
       .project-grid, .case.featured, .job { grid-template-columns: 1fr; }
@@ -129,7 +129,8 @@
     <nav class="shell nav" aria-label="Main navigation">
       <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">√5</span> Venky Karthikeyan</a>
       <div class="nav-links">
-        <a href="#projects">Selected work</a>
+        <a href="#professional-work">Professional work</a>
+        <a href="#projects">Personal projects</a>
         <a href="#experience">Experience</a>
         <a href="#education">Education</a>
         <a class="nav-contact" href="#contact">Contact</a>
@@ -143,7 +144,7 @@
         <h1 id="hero-title">I build data products <span>teams can use.</span></h1>
         <p class="intro">I work in commercial analytics at AstraZeneca in Chennai. My work spans oncology reporting, enterprise search, and large-scale retail pipelines. I’m open to analytics engineering and data engineering roles.</p>
         <div class="buttons">
-          <a class="btn action primary" href="#projects">Explore my work <span aria-hidden="true">↓</span></a>
+          <a class="btn action primary" href="#professional-work">Explore my work <span aria-hidden="true">↓</span></a>
           <a class="btn action" href="https://www.linkedin.com/in/vsroot5/">LinkedIn <span aria-hidden="true">↗</span></a>
         </div>
       </div>
@@ -164,8 +165,8 @@
       <div class="metric"><strong>20K</strong><span>Documents made searchable on Azure</span></div>
       <div class="metric"><strong>45B+</strong><span>Transactions in PySpark optimization work</span></div>
     </section>
-    <section id="projects" class="section" aria-labelledby="work-title">
-      <h2 id="work-title">Selected work</h2>
+    <section id="professional-work" class="section" aria-labelledby="professional-title">
+      <h2 id="professional-title">Professional work</h2>
       <div class="project-grid">
         <article class="case featured">
           <div class="case-content">
@@ -179,6 +180,11 @@
             <ul><li>Demand and prescription trends</li><li>Field activity and reach</li><li>Week, month, and quarter comparisons</li></ul>
           </div>
         </article>
+      </div>
+    </section>
+    <section id="projects" class="section" aria-labelledby="personal-title">
+      <h2 id="personal-title">Personal projects</h2>
+      <div class="project-grid">
         <article class="case">
           <div class="case-art chess" aria-hidden="true"><img src="static/chess.png" width="100" height="100" alt="" loading="lazy"></div>
           <div class="case-content">

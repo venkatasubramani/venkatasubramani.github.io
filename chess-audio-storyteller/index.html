@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chess Audio Storyteller — PGN to Narrated Match Studio</title>
+<link rel="stylesheet" href="./studio.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #0B0F17;
+    color: #F1F5F9;
+  }
+  .font-mono-num {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  /* Board squares */
+  .sq-light { background-color: #E9E2D0; }
+  .sq-dark  { background-color: #6B8E78; }
+  .sq-hl-light { background-color: #F2DE7E !important; }
+  .sq-hl-dark  { background-color: #C7B34B !important; }
+  .sq-dramatic-light { background-color: #FDBA74 !important; }
+  .sq-dramatic-dark  { background-color: #D97706 !important; }
+
+  /* Piece styling */
+  .chess-piece {
+    width: 86%;
+    height: 86%;
+    user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.28));
+    transition: transform 0.18s ease-out;
+  }
+
+  /* Equalizer pulse when bot is speaking */
+  @keyframes eqBounce {
+    0%, 100% { transform: scaleY(0.35); }
+    50% { transform: scaleY(1); }
+  }
+  .eq-bar {
+    transform-origin: bottom;
+    animation: eqBounce 0.7s ease-in-out infinite;
+  }
+  .eq-bar:nth-child(2) { animation-delay: 0.15s; }
+  .eq-bar:nth-child(3) { animation-delay: 0.3s; }
+  .eq-bar:nth-child(4) { animation-delay: 0.45s; }
+  .eq-paused .eq-bar {
+    animation: none;
+    transform: scaleY(0.25);
+  }
+
+  /* Custom subtle scrollbars */
+  .thin-scroll::-webkit-scrollbar { width: 6px; }
+  .thin-scroll::-webkit-scrollbar-track { background: #0F172A; }
+  .thin-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+</style>
+</head>
+<body class="min-h-screen antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Top Header -->
+  <header class="border-b border-slate-800/90 bg-slate-950/80 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold text-lg">
+          ♞
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">
+            Chess Audio Storyteller
+          </h1>
+          <p class="text-xs text-slate-400">Upload any PGN &middot; Live move-by-move audio bot &amp; storytelling pacing</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="sr-only" for="championship-game">2026 World Chess Championship game</label>
+        <select id="championship-game" class="max-w-full px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-700 text-white border border-emerald-500">
+          <option value="latest">World Championship · Latest game</option>
+        </select>
+        <button id="btn-preset-opera" type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition">
+          Opera Game (1858)
+        </button>
+        <button id="btn-open-pgn" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 text-slate-950 hover:bg-amber-400 transition flex items-center gap-1.5">
+          <span>+</span> Paste / Upload PGN
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+    <a href="https://lichess.org/broadcast/fide-world-chess-championship-2026/qfkdt8mn" target="_blank" rel="noopener" class="font-medium text-emerald-300 underline underline-offset-2">2026 World Championship on Lichess</a>
+    <span id="championship-status" role="status" class="text-slate-400">Checking for games…</span>
+  </div>
+
+  <!-- Toast Banner -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden max-w-sm rounded-xl bg-slate-900 border border-emerald-500/50 text-slate-100 px-4 py-3 text-sm shadow-2xl"></div>
+
+  <!-- Main Workspace -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- Left Column: Board + Eval Bar + Transport -->
+    <section class="lg:col-span-7 flex flex-col gap-3">
+
+      <!-- Match Header Strip -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-2.5">
+        <div>
+          <div id="match-event" class="text-xs font-medium text-emerald-400">FIDE World Chess Championship 2026 &middot; Round 2</div>
+          <div id="match-players" class="text-sm sm:text-base font-semibold text-white">Gukesh Dommaraju vs. Javokhir Sindarov</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="match-result" class="font-mono-num text-xs px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-slate-200">1/2-1/2</span>
+          <span id="match-opening" class="hidden sm:inline-block text-xs px-2.5 py-1 rounded-md bg-slate-800/70 text-slate-300 border border-slate-700/70">London System</span>
+        </div>
+      </div>
+
+      <!-- Top Player Bar -->
+      <div class="flex items-center justify-between px-1 text-xs sm:text-sm">
+        <div class="flex items-center gap-2">
+          <span id="top-color-dot" class="w-3 h-3 rounded-sm bg-slate-950 border border-slate-500 inline-block"></span>
+          <span id="top-player-name" class="font-semibold text-slate-200">Javokhir Sindarov</span>
+          <span id="top-player-elo" class="font-mono-num text-xs text-slate-400">(2782)</span>
+        </div>
+        <span id="top-turn-pill" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">TO MOVE</span>
+      </div>
+
+      <!-- Eval Bar + Chessboard Container -->
+      <div class="flex gap-3 items-stretch w-full max-w-[600px] mx-auto lg:mx-0">
+        <!-- Vertical Eval Bar -->
+        <div class="w-8 sm:w-9 rounded-lg overflow-hidden bg-slate-900 border border-slate-700 relative flex flex-col justify-end shrink-0 select-none" aria-label="Position evaluation bar">
+          <div id="eval-white-fill" class="w-full bg-slate-100 transition-all duration-500 ease-out" style="height: 52%;"></div>
+          <div id="eval-score-label" class="absolute inset-x-0 bottom-1.5 text-center font-mono-num text-[10px] font-bold text-slate-900 leading-none">
+            +0.2
+          </div>
+        </div>
+
+        <!-- 8x8 Chessboard + SVG Arrow Layer -->
+        <div class="relative flex-1 aspect-square rounded-xl overflow-hidden shadow-2xl border border-slate-700/80 bg-slate-900">
+          <div id="board-grid" class="grid grid-cols-8 grid-rows-8 w-full h-full"></div>
+          <svg id="arrow-overlay" viewBox="0 0 800 800" class="absolute inset-0 w-full h-full pointer-events-none">
+            <defs>
+              <marker id="head-normal" markerWidth="4" markerHeight="4" refX="2.4" refY="2" orient="auto">
+                <path d="M0,0.4 L3.2,2 L0,3.6 Z" fill="rgba(16, 185, 129, 0.85)" />
+              </marker>
+              <marker id="head-dramatic" markerWidth="4" markerHeight="4" refX="2.4" refY="2" orient="auto">
+                <path d="M0,0.4 L3.2,2 L0,3.6 Z" fill="rgba(245, 158, 11, 0.95)" />
+              </marker>
+            </defs>
+            <g id="arrow-group"></g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Bottom Player Bar -->
+      <div class="flex items-center justify-between px-1 text-xs sm:text-sm max-w-[600px] mx-auto lg:mx-0 w-full">
+        <div class="flex items-center gap-2">
+          <span id="bottom-color-dot" class="w-3 h-3 rounded-sm bg-slate-100 border border-slate-400 inline-block"></span>
+          <span id="bottom-player-name" class="font-semibold text-slate-200">Gukesh Dommaraju</span>
+          <span id="bottom-player-elo" class="font-mono-num text-xs text-slate-400">(2710)</span>
+        </div>
+        <span id="bottom-turn-pill" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">TO MOVE</span>
+      </div>
+
+      <!-- Transport & Audio Control Bar -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 max-w-[600px] mx-auto lg:mx-0 w-full">
+        <div class="flex items-center gap-1.5">
+          <button id="btn-first" type="button" title="First move" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono-num text-xs transition">|&lt;</button>
+          <button id="btn-prev" type="button" title="Previous move (Left arrow)" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono-num text-sm transition">&lt;</button>
+          <button id="btn-play" type="button" class="px-4 h-9 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition flex items-center gap-2">
+            <span id="play-icon">&#9654;</span>
+            <span id="play-label">Narrate</span>
+          </button>
+          <button id="btn-next" type="button" title="Next move (Right arrow)" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono-num text-sm transition">&gt;</button>
+          <button id="btn-last" type="button" title="Final position" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono-num text-xs transition">&gt;|</button>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <button id="btn-flip" type="button" title="Flip board" class="px-2.5 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition">
+            Flip
+          </button>
+          <button id="btn-voice-toggle" type="button" title="Toggle voice narration" class="px-2.5 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-medium transition">
+            Voice: ON
+          </button>
+          <button id="btn-sfx-toggle" type="button" title="Toggle chess piece sound effects" class="px-2.5 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-medium transition">
+            SFX: ON
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Audio Bot Teleprompter, Pacing, Sparkline & Move List -->
+    <section class="lg:col-span-5 flex flex-col gap-4">
+
+      <!-- Narrator Persona & Speed Bar -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div class="text-[11px] font-medium text-slate-400 mb-1.5">Narrator Persona</div>
+          <div class="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800">
+            <button data-style="storyteller" type="button" class="style-btn px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-600 text-white transition">Storyteller</button>
+            <button data-style="shorts" type="button" class="style-btn px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white transition">Hype Shorts</button>
+            <button data-style="coach" type="button" class="style-btn px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white transition">Club Coach</button>
+          </div>
+        </div>
+        <div>
+          <div class="text-[11px] font-medium text-slate-400 mb-1.5">Speed</div>
+          <div class="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800">
+            <button data-speed="0.85" type="button" class="speed-btn px-2 py-1 rounded-md text-xs font-mono-num text-slate-300 hover:text-white transition">0.85x</button>
+            <button data-speed="1" type="button" class="speed-btn px-2 py-1 rounded-md text-xs font-mono-num bg-slate-700 text-white transition">1.0x</button>
+            <button data-speed="1.25" type="button" class="speed-btn px-2 py-1 rounded-md text-xs font-mono-num text-slate-300 hover:text-white transition">1.25x</button>
+          </div>
+        </div>
+        <div class="w-full pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2 flex-1 min-w-[180px]">
+            <label for="voice-select" class="text-[11px] font-medium text-slate-400 shrink-0">Bot Voice</label>
+            <select id="voice-select" class="flex-1 min-w-0 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+              <option value="">Loading browser voices...</option>
+            </select>
+          </div>
+          <button id="btn-test-voice" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-emerald-300 transition shrink-0">
+            Test Voice
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Audio Bot Teleprompter Card -->
+      <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-4 shadow-lg">
+        <div class="flex items-center justify-between gap-2 mb-3">
+          <div class="flex items-center gap-2.5">
+            <!-- Animated equalizer bars -->
+            <div id="eq-indicator" class="eq-paused flex items-end gap-0.5 h-4 w-5">
+              <span class="eq-bar w-1 h-4 bg-emerald-400 rounded-full"></span>
+              <span class="eq-bar w-1 h-3 bg-emerald-400 rounded-full"></span>
+              <span class="eq-bar w-1 h-4 bg-emerald-400 rounded-full"></span>
+              <span class="eq-bar w-1 h-2.5 bg-emerald-400 rounded-full"></span>
+            </div>
+            <span id="move-title-badge" class="font-mono-num text-xs font-semibold text-white bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700">
+              Start Position
+            </span>
+          </div>
+          <span id="pacing-badge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+            INTRO
+          </span>
+        </div>
+
+        <p id="narration-text" class="text-sm sm:text-[15px] leading-relaxed text-slate-100 min-h-[76px]">
+          Press Narrate to start the live audio review, or click any move below to jump straight to a turning point.
+        </p>
+
+        <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <span id="pacing-hint">Pacing: Fast on quiet moves &middot; Slow &amp; dramatic on key moments</span>
+          <button id="btn-copy-script" type="button" class="text-emerald-400 hover:text-emerald-300 font-medium shrink-0 ml-2">
+            Copy Full Script
+          </button>
+        </div>
+      </div>
+
+      <!-- Evaluation Sparkline Timeline -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-slate-300">Evaluation &amp; Turning Points</span>
+          <span id="turning-point-count" class="text-[11px] text-amber-400 font-medium">0 crucial moments</span>
+        </div>
+        <div class="relative h-20 w-full">
+          <svg id="sparkline-svg" viewBox="0 0 400 80" preserveAspectRatio="none" class="w-full h-full cursor-pointer rounded-md bg-slate-950/80 border border-slate-800"></svg>
+        </div>
+      </div>
+
+      <!-- Clickable Move List -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden flex flex-col">
+        <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-xs">
+          <span class="font-semibold text-slate-300">Move List</span>
+          <span class="text-slate-400"><span class="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1"></span>Crucial move</span>
+        </div>
+        <div id="move-list" class="thin-scroll max-h-60 overflow-y-auto p-2 grid grid-cols-1 gap-0.5 text-sm"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Paste / Upload PGN Modal -->
+  <div id="pgn-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-5 shadow-2xl">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-base font-bold text-white">Paste or Upload Any Chess PGN</h2>
+        <button id="btn-close-modal" type="button" class="text-slate-400 hover:text-white text-lg px-2">&times;</button>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">
+        Copy a PGN from Chess.com, Lichess, or a World Championship broadcast—or upload a <code>.pgn</code> file. The bot will parse every move, evaluate turning points, and generate a custom narrated story.
+      </p>
+      <div class="mb-3 flex items-center gap-3">
+        <label class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 cursor-pointer transition">
+          Choose .pgn file
+          <input id="pgn-file-input" type="file" accept=".pgn,.txt" class="hidden">
+        </label>
+        <span id="file-name-label" class="text-xs text-slate-400 truncate">No file selected</span>
+      </div>
+      <textarea id="pgn-textarea" rows="7" placeholder="[White &quot;Player 1&quot;]&#10;[Black &quot;Player 2&quot;]&#10;&#10;1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 ..." class="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 font-mono-num text-xs text-slate-100 focus:outline-none focus:border-emerald-500"></textarea>
+      <div id="pgn-error" class="hidden mt-2 text-xs text-rose-400"></div>
+      <div class="mt-4 flex items-center justify-end gap-2">
+        <button id="btn-cancel-modal" type="button" class="px-3.5 py-2 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Cancel</button>
+        <button id="btn-load-pgn" type="button" class="px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-500 transition">Analyze &amp; Build Story</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  // =========================================================================
+  // 1. VERIFIED PRESET GAMES & CURATED WORLD CHAMPIONSHIP STORY BEATS
+  // =========================================================================
+  const PRESETS = {
+    wcc2026_g1: {
+      pgn: `[Event "FIDE World Chess Championship 2026"]
+[Round "1"]
+[White "Javokhir Sindarov"]
+[Black "Gukesh Dommaraju"]
+[WhiteElo "2782"]
+[BlackElo "2710"]
+[Result "1/2-1/2"]
+[Opening "Ruy Lopez: Berlin Defense, l'Hermet Variation, Berlin Wall Defense"]
+[GameURL "https://lichess.org/broadcast/fide-world-chess-championship-2026/game-1/xLgOJ6cb/j7pdr7s2"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. d4 Nd6 6. Bxc6 dxc6 7. dxe5 Nf5 8. Qxd8+ Kxd8 9. Rd1+ Ke8 10. Nc3 Ne7 11. h3 Ng6 12. Be3 Be7 13. Ne4 Bd7 14. c4 a5 15. Rd2 a4 16. Rad1 Be6 17. b3 Bb4 18. Re2 h6 19. Ng3 c5 20. Nh5 Rg8 21. g4 Ke7 22. Ne1 axb3 23. axb3 Nxe5 24. f4 g6 25. Ng3 Nc6 26. f5 gxf5 27. Nxf5+ Kf6 28. Rf2 Rgd8 29. Nd3 Bxf5 30. Rxf5+ Kg7 31. Rh5 Bc3 32. Bxh6+ Kg8 33. Rg5+ Kh7 34. Rh5 Kg8 35. Rg5+ Kh7 36. Rh5 Kg8 37. Rg5+ Kh7 38. Rh5 Kg8 1/2-1/2`
+    },
+    wcc2026_g2: {
+      pgn: `[Event "FIDE World Chess Championship 2026"]
+[Site "Fondation Martin Bodmer, Cologny, Geneva"]
+[Date "2026.11.25"]
+[Round "2"]
+[White "Gukesh Dommaraju"]
+[Black "Javokhir Sindarov"]
+[WhiteElo "2710"]
+[BlackElo "2782"]
+[Opening "London System"]
+[GameURL "https://lichess.org/broadcast/fide-world-chess-championship-2026/game-2/L3j03TZq/p6HX9bPF"]
+[Result "1/2-1/2"]
+
+1. d4 d5 2. Nf3 Nf6 3. Bf4 c5 4. e3 e6 5. Nbd2 Nc6 6. c3 Be7 7. Ne5 Qb6 8. Rb1 Nxe5 9. Bxe5 Bd7 10. a4 O-O 11. Bd3 Qd8 12. O-O Rc8 13. Ra1 Be8 14. Qe2 Nd7 15. Bg3 f5 16. f3 Nf6 17. Be5 Nd7 18. Bg3 Nf6 19. Be5 Nd7 20. Bg3 Nf6 1/2-1/2`,
+      curatedBeats: {
+        0: {
+          pacing: 'dramatic',
+          storyteller: "Welcome to Game 2 of the 2026 FIDE World Chess Championship in Geneva. Defending champion Gukesh Dommaraju has the White pieces against Uzbek challenger Javokhir Sindarov, with the match tied half a point each.",
+          shorts: "World Championship Game 2 in Geneva! Gukesh has White against Sindarov—and watch how fast this London System turns into a psychological clock battle.",
+          coach: "In Game 2 of the 2026 World Championship, White aims to press for the first advantage while Black looks to equalize smoothly."
+        },
+        5: {
+          pacing: 'dramatic',
+          storyteller: "3. Bf4! Gukesh surprises the chess world with the London System—calling it a nostalgic opening he used to play as a teenager during the pandemic.",
+          shorts: "Wait—3. Bf4?! World Champion Gukesh plays the London System in a World Championship game!",
+          coach: "3. Bf4 establishes the London System, placing the dark-squared bishop outside the pawn chain before playing e3 and c3."
+        },
+        14: {
+          pacing: 'dramatic',
+          storyteller: "Here comes the first real test: 7...Qb6! Sindarov immediately eyes the undefended b2 pawn. Gukesh later admitted he knew this move existed, but couldn't fully recall his prep notes at the board.",
+          shorts: "7...Qb6! Sindarov hits b2 right away—and Gukesh actually forgot part of his prep right here!",
+          coach: "7...Qb6 is the classic counter against the London, targeting the b2 pawn that White's dark-squared bishop left behind."
+        },
+        15: {
+          pacing: 'normal',
+          storyteller: "8. Rb1. Gukesh calmly sidesteps the threat and defends b2 with the rook, keeping his queen flexible.",
+          shorts: "8. Rb1—calm defense, protecting b2 without trading queens.",
+          coach: "8. Rb1 protects the b2 pawn cleanly while avoiding weaknesses on the queenside."
+        },
+        22: {
+          pacing: 'normal',
+          storyteller: "11...Qd8. Mission accomplished—having nudged White's rook to b1, Sindarov tucks his queen back home to prepare a rock-solid defensive shell.",
+          shorts: "11...Qd8—Sindarov's queen heads home after disrupting White's rook.",
+          coach: "11...Qd8 reroutes the queen safely while preparing a flexible central setup."
+        },
+        30: {
+          pacing: 'dramatic',
+          storyteller: "15...f5! Sindarov clamps down on the e4 square and shuts down White's kingside ambitions. Meanwhile, the real drama is on the clock—Gukesh is trailing by nearly 40 minutes.",
+          shorts: "15...f5! Sindarov locks the center down—and Gukesh is now down almost 40 minutes on the clock!",
+          coach: "15...f5 prevents White from ever breaking with e4 and solidifies Black's kingside structure."
+        },
+        31: {
+          pacing: 'dramatic',
+          storyteller: "16. f3. After a long think that drains more of his clock, Gukesh prepares e4—but Sindarov's knight is ready to hop straight back to f6.",
+          shorts: "16. f3—Gukesh burns huge time trying to break through, but Black's fortress holds.",
+          coach: "16. f3 tries to support an eventual e4 pawn break, though White's clock deficit makes pushing risky."
+        },
+        33: {
+          pacing: 'dramatic',
+          storyteller: "17. Be5. Facing a fortress and a 40-minute clock deficit, Gukesh tests whether Sindarov wants to repeat moves—and the challenger happily obliges.",
+          shorts: "17. Be5! Gukesh offers the dance—and Sindarov gladly repeats.",
+          coach: "17. Be5 begins the repetition sequence; trailing badly on time, White decides not to overpress."
+        },
+        40: {
+          pacing: 'dramatic',
+          storyteller: "20...Nf6! Threefold repetition. Unlike Game 1, Sindarov claims the draw properly this time. A quick 20-move peace treaty in Geneva keeps the World Championship tied 1 to 1.",
+          shorts: "20...Nf6—threefold repetition! A 20-move draw in Geneva leaves Gukesh and Sindarov locked at 1–1!",
+          coach: "After 20...Nf6, the position repeats three times, ending Game 2 in a draw at 1–1."
+        }
+      }
+    },
+    opera_1858: {
+      pgn: `[Event "Paris Opera"]
+[Site "Paris, France"]
+[Date "1858.11.02"]
+[Round "1"]
+[White "Paul Morphy"]
+[Black "Duke Karl & Count Isouard"]
+[Opening "Philidor Defense"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0`,
+      curatedBeats: {
+        0: {
+          pacing: 'dramatic',
+          storyteller: "Paris, 1858. Inside a private opera box, American prodigy Paul Morphy faces two consulting noblemen in the most famous attacking game in chess history.",
+          shorts: "The greatest 17-move attack in chess history! Watch Paul Morphy sacrifice everything inside a Paris opera box.",
+          coach: "Morphy's Opera Game is the ultimate masterclass in rapid piece development, open files, and attacking an uncastled king."
+        },
+        19: {
+          pacing: 'dramatic',
+          storyteller: "10. Nxb5! Boom! Morphy sacrifices a full knight just to rip open the highway straight toward Black's stranded king.",
+          shorts: "10. Nxb5!! Morphy sacks a whole knight on move 10—and Black's king is about to regret never castling!",
+          coach: "10. Nxb5 is a brilliant positional sacrifice: White gives up a knight for two pawns, open lines, and a crushing lead in development."
+        },
+        25: {
+          pacing: 'dramatic',
+          storyteller: "13. Rxd7! Morphy throws an exchange into the fire, eliminating the knight defending the d-file and dragging Black's rook into a deadly pin.",
+          shorts: "13. Rxd7!! Another sacrifice! Morphy rips away the defender and locks Black in a fatal pin.",
+          coach: "13. Rxd7 removes a key defender so White's second rook can swing to d1 with tempo."
+        },
+        31: {
+          pacing: 'dramatic',
+          storyteller: "16. Qb8+!! The immortal queen sacrifice! Black's knight is forced to capture, clearing the d8 square for one final blow.",
+          shorts: "16. Qb8+!! THE QUEEN SACRIFICE! Black has only one legal move—and it's curtains!",
+          coach: "16. Qb8+ deflects the d7 knight away from defending the d8 square, forcing checkmate on the next move."
+        },
+        33: {
+          pacing: 'dramatic',
+          storyteller: "17. Rd8 checkmate! Just a rook and a bishop left on the board, and every single piece Morphy developed delivered the knockout.",
+          shorts: "17. Rd8 CHECKMATE! Rook and bishop finish the job in 17 moves—pure chess art!",
+          coach: "17. Rd8# is the classic Opera Mate: the bishop on g5 protects the rook while cutting off the king's escape."
+        }
+      }
+    }
+  };
+
+  // =========================================================================
+  // 2. COMPLETE IN-BROWSER CHESS ENGINE, SAN PARSER & HEURISTIC EVALUATOR
+  // =========================================================================
+  const FILES = ['a','b','c','d','e','f','g','h'];
+  const PIECE_VAL = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
+
+  // Piece-square bonus tables (from White's perspective, index 0 = a8 .. 63 = h1)
+  const PST = {
+    p: [
+       0,  0,  0,  0,  0,  0,  0,  0,
+      40, 40, 40, 45, 45, 40, 40, 40,
+      12, 12, 18, 28, 28, 18, 12, 12,
+       5,  5, 10, 24, 24, 10,  5,  5,
+       0,  0,  4, 22, 22,  4,  0,  0,
+       5, -4, -6,  0,  0, -6, -4,  5,
+       5, 10, 10,-18,-18, 10, 10,  5,
+       0,  0,  0,  0,  0,  0,  0,  0
+    ],
+    n: [
+     -45,-35,-25,-25,-25,-25,-35,-45,
+     -35,-15,  0,  4,  4,  0,-15,-35,
+     -25,  4, 14, 18, 18, 14,  4,-25,
+     -25,  6, 18, 22, 22, 18,  6,-25,
+     -25,  4, 16, 20, 20, 16,  4,-25,
+     -25,  6, 12, 14, 14, 12,  6,-25,
+     -35,-15,  0,  4,  4,  0,-15,-35,
+     -45,-35,-25,-25,-25,-25,-35,-45
+    ],
+    b: [
+     -20,-10,-10,-10,-10,-10,-10,-20,
+     -10,  0,  0,  0,  0,  0,  0,-10,
+     -10,  4,  8, 12, 12,  8,  4,-10,
+     -10,  6, 10, 14, 14, 10,  6,-10,
+     -10,  4, 12, 12, 12, 12,  4,-10,
+     -10, 10, 10, 10, 10, 10, 10,-10,
+     -10,  8,  0,  0,  0,  0,  8,-10,
+     -20,-10,-10,-10,-10,-10,-10,-20
+    ],
+    r: [
+       0,  0,  2,  6,  6,  2,  0,  0,
+       6, 12, 12, 12, 12, 12, 12,  6,
+      -4,  0,  0,  0,  0,  0,  0, -4,
+      -4,  0,  0,  0,  0,  0,  0, -4,
+      -4,  0,  0,  0,  0,  0,  0, -4,
+      -4,  0,  0,  0,  0,  0,  0, -4,
+      -4,  0,  0,  0,  0,  0,  0, -4,
+       0,  0,  4, 10, 10,  4,  0,  0
+    ],
+    q: [
+     -20,-10,-10, -5, -5,-10,-10,-20,
+     -10,  0,  0,  0,  0,  0,  0,-10,
+     -10,  0,  5,  5,  5,  5,  0,-10,
+      -5,  0,  5,  6,  6,  5,  0, -5,
+       0,  0,  5,  6,  6,  5,  0, -5,
+     -10,  4,  5,  5,  5,  5,  0,-10,
+     -10,  0,  4,  0,  0,  0,  0,-10,
+     -20,-10,-10, -5, -5,-10,-10,-20
+    ],
+    k: [
+     -30,-40,-40,-50,-50,-40,-40,-30,
+     -30,-40,-40,-50,-50,-40,-40,-30,
+     -30,-40,-40,-50,-50,-40,-40,-30,
+     -30,-40,-40,-50,-50,-40,-40,-30,
+     -20,-30,-30,-40,-40,-30,-30,-20,
+     -10,-20,-20,-20,-20,-20,-20,-10,
+      14, 18,  0,  0,  0,  0, 18, 14,
+      18, 28, 10,  0,  0, 10, 28, 18
+    ]
+  };
+
+  function createInitialState() {
+    const startRows = [
+      ['br','bn','bb','bq','bk','bb','bn','br'],
+      ['bp','bp','bp','bp','bp','bp','bp','bp'],
+      [null,null,null,null,null,null,null,null],
+      [null,null,null,null,null,null,null,null],
+      [null,null,null,null,null,null,null,null],
+      [null,null,null,null,null,null,null,null],
+      ['wp','wp','wp','wp','wp','wp','wp','wp'],
+      ['wr','wn','wb','wq','wk','wb','wn','wr']
+    ];
+    return {
+      board: startRows.flat(),
+      turn: 'w',
+      castling: { K: true, Q: true, k: true, q: true },
+      ep: -1
+    };
+  }
+
+  function cloneState(s) {
+    return {
+      board: s.board.slice(),
+      turn: s.turn,
+      castling: { ...s.castling },
+      ep: s.ep
+    };
+  }
+
+  function sqToIndex(sq) {
+    const f = FILES.indexOf(sq[0]);
+    const r = 8 - parseInt(sq[1], 10);
+    return r * 8 + f;
+  }
+
+  function indexToSq(idx) {
+    return FILES[idx % 8] + (8 - Math.floor(idx / 8));
+  }
+
+  function isAttacked(board, sqIdx, byColor) {
+    const r = Math.floor(sqIdx / 8);
+    const c = sqIdx % 8;
+    // Pawn attacks
+    const pDir = byColor === 'w' ? 1 : -1;
+    const pr = r + pDir;
+    if (pr >= 0 && pr < 8) {
+      if (c > 0 && board[pr * 8 + c - 1] === byColor + 'p') return true;
+      if (c < 7 && board[pr * 8 + c + 1] === byColor + 'p') return true;
+    }
+    // Knight attacks
+    const kOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+    for (const [dr, dc] of kOffsets) {
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && board[nr * 8 + nc] === byColor + 'n') return true;
+    }
+    // King attacks
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (!dr && !dc) continue;
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && board[nr * 8 + nc] === byColor + 'k') return true;
+      }
+    }
+    // Diagonal sliders (B, Q)
+    const diag = [[-1,-1],[-1,1],[1,-1],[1,1]];
+    for (const [dr, dc] of diag) {
+      let nr = r + dr, nc = c + dc;
+      while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+        const p = board[nr * 8 + nc];
+        if (p) {
+          if (p === byColor + 'b' || p === byColor + 'q') return true;
+          break;
+        }
+        nr += dr; nc += dc;
+      }
+    }
+    // Orthogonal sliders (R, Q)
+    const ortho = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (const [dr, dc] of ortho) {
+      let nr = r + dr, nc = c + dc;
+      while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+        const p = board[nr * 8 + nc];
+        if (p) {
+          if (p === byColor + 'r' || p === byColor + 'q') return true;
+          break;
+        }
+        nr += dr; nc += dc;
+      }
+    }
+    return false;
+  }
+
+  function applyMoveRaw(state, move) {
+    const next = cloneState(state);
+    const b = next.board;
+    const piece = b[move.from];
+    const color = piece[0];
+    const type = piece[1];
+
+    b[move.from] = null;
+    if (move.epCapture) {
+      const capSq = move.to + (color === 'w' ? 8 : -8);
+      b[capSq] = null;
+    }
+    b[move.to] = move.promo ? (color + move.promo) : piece;
+
+    // Castling rook move
+    if (move.castle === 'K') { b[63] = null; b[61] = 'wr'; }
+    if (move.castle === 'Q') { b[56] = null; b[59] = 'wr'; }
+    if (move.castle === 'k') { b[7] = null; b[5] = 'br'; }
+    if (move.castle === 'q') { b[0] = null; b[3] = 'br'; }
+
+    // Update castling rights
+    if (piece === 'wk') { next.castling.K = false; next.castling.Q = false; }
+    if (piece === 'bk') { next.castling.k = false; next.castling.q = false; }
+    if (move.from === 63 || move.to === 63) next.castling.K = false;
+    if (move.from === 56 || move.to === 56) next.castling.Q = false;
+    if (move.from === 7 || move.to === 7) next.castling.k = false;
+    if (move.from === 0 || move.to === 0) next.castling.q = false;
+
+    // En passant square
+    if (type === 'p' && Math.abs(move.to - move.from) === 16) {
+      next.ep = (move.from + move.to) / 2;
+    } else {
+      next.ep = -1;
+    }
+
+    next.turn = color === 'w' ? 'b' : 'w';
+    return next;
+  }
+
+  function isKingInCheck(board, color) {
+    const kSq = board.indexOf(color + 'k');
+    if (kSq === -1) return false;
+    return isAttacked(board, kSq, color === 'w' ? 'b' : 'w');
+  }
+
+  function generateLegalMoves(state) {
+    const b = state.board;
+    const color = state.turn;
+    const opp = color === 'w' ? 'b' : 'w';
+    const pseudo = [];
+
+    for (let i = 0; i < 64; i++) {
+      const p = b[i];
+      if (!p || p[0] !== color) continue;
+      const type = p[1];
+      const r = Math.floor(i / 8);
+      const c = i % 8;
+
+      if (type === 'p') {
+        const dir = color === 'w' ? -1 : 1;
+        const startRow = color === 'w' ? 6 : 1;
+        const promoRow = color === 'w' ? 0 : 7;
+        const one = (r + dir) * 8 + c;
+        if (r + dir >= 0 && r + dir < 8 && !b[one]) {
+          if (r + dir === promoRow) {
+            for (const pr of ['q','r','b','n']) pseudo.push({ from: i, to: one, piece: 'p', promo: pr });
+          } else {
+            pseudo.push({ from: i, to: one, piece: 'p' });
+            const two = (r + 2 * dir) * 8 + c;
+            if (r === startRow && !b[two]) pseudo.push({ from: i, to: two, piece: 'p' });
+          }
+        }
+        for (const dc of [-1, 1]) {
+          const nc = c + dc;
+          if (nc < 0 || nc > 7 || r + dir < 0 || r + dir > 7) continue;
+          const cap = (r + dir) * 8 + nc;
+          if (b[cap] && b[cap][0] === opp) {
+            if (r + dir === promoRow) {
+              for (const pr of ['q','r','b','n']) pseudo.push({ from: i, to: cap, piece: 'p', capture: true, promo: pr });
+            } else {
+              pseudo.push({ from: i, to: cap, piece: 'p', capture: true });
+            }
+          } else if (cap === state.ep) {
+            pseudo.push({ from: i, to: cap, piece: 'p', capture: true, epCapture: true });
+          }
+        }
+      } else if (type === 'n') {
+        for (const [dr, dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]) {
+          const nr = r + dr, nc = c + dc;
+          if (nr < 0 || nr > 7 || nc < 0 || nc > 7) continue;
+          const t = nr * 8 + nc;
+          if (!b[t] || b[t][0] === opp) pseudo.push({ from: i, to: t, piece: 'n', capture: !!b[t] });
+        }
+      } else if (type === 'k') {
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            if (!dr && !dc) continue;
+            const nr = r + dr, nc = c + dc;
+            if (nr < 0 || nr > 7 || nc < 0 || nc > 7) continue;
+            const t = nr * 8 + nc;
+            if (!b[t] || b[t][0] === opp) pseudo.push({ from: i, to: t, piece: 'k', capture: !!b[t] });
+          }
+        }
+        if (color === 'w' && i === 60 && !isAttacked(b, 60, 'b')) {
+          if (state.castling.K && !b[61] && !b[62] && !isAttacked(b, 61, 'b') && !isAttacked(b, 62, 'b')) {
+            pseudo.push({ from: 60, to: 62, piece: 'k', castle: 'K' });
+          }
+          if (state.castling.Q && !b[59] && !b[58] && !b[57] && !isAttacked(b, 59, 'b') && !isAttacked(b, 58, 'b')) {
+            pseudo.push({ from: 60, to: 58, piece: 'k', castle: 'Q' });
+          }
+        }
+        if (color === 'b' && i === 4 && !isAttacked(b, 4, 'w')) {
+          if (state.castling.k && !b[5] && !b[6] && !isAttacked(b, 5, 'w') && !isAttacked(b, 6, 'w')) {
+            pseudo.push({ from: 4, to: 6, piece: 'k', castle: 'k' });
+          }
+          if (state.castling.q && !b[3] && !b[2] && !b[1] && !isAttacked(b, 3, 'w') && !isAttacked(b, 2, 'w')) {
+            pseudo.push({ from: 4, to: 2, piece: 'k', castle: 'q' });
+          }
+        }
+      } else {
+        const dirs = type === 'b'
+          ? [[-1,-1],[-1,1],[1,-1],[1,1]]
+          : type === 'r'
+            ? [[-1,0],[1,0],[0,-1],[0,1]]
+            : [[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]];
+        for (const [dr, dc] of dirs) {
+          let nr = r + dr, nc = c + dc;
+          while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+            const t = nr * 8 + nc;
+            if (!b[t]) {
+              pseudo.push({ from: i, to: t, piece: type });
+            } else {
+              if (b[t][0] === opp) pseudo.push({ from: i, to: t, piece: type, capture: true });
+              break;
+            }
+            nr += dr; nc += dc;
+          }
+        }
+      }
+    }
+
+    return pseudo.filter(m => {
+      const next = applyMoveRaw(state, m);
+      return !isKingInCheck(next.board, color);
+    });
+  }
+
+  function matchSanMove(state, sanRaw) {
+    const legal = generateLegalMoves(state);
+    const san = sanRaw.replace(/[+#!?]+$/g, '').trim();
+
+    if (san === 'O-O' || san === '0-0') {
+      return legal.find(m => m.castle === (state.turn === 'w' ? 'K' : 'k'));
+    }
+    if (san === 'O-O-O' || san === '0-0-0') {
+      return legal.find(m => m.castle === (state.turn === 'w' ? 'Q' : 'q'));
+    }
+
+    const match = san.match(/^([KQRBN])?([a-h])?([1-8])?(x)?([a-h][1-8])(?:=([QRBN]))?$/);
+    if (!match) return null;
+
+    const pieceType = (match[1] || 'P').toLowerCase();
+    const fromFile = match[2] || null;
+    const fromRank = match[3] || null;
+    const targetIdx = sqToIndex(match[5]);
+    const promo = match[6] ? match[6].toLowerCase() : null;
+
+    return legal.find(m => {
+      if (m.piece !== pieceType || m.to !== targetIdx) return false;
+      if ((m.promo || null) !== promo) return false;
+      const fromSq = indexToSq(m.from);
+      if (fromFile && fromSq[0] !== fromFile) return false;
+      if (fromRank && fromSq[1] !== fromRank) return false;
+      return true;
+    }) || null;
+  }
+
+  function evaluatePosition(state, isMate, isCheck) {
+    if (isMate) {
+      return state.turn === 'w' ? -9999 : 9999;
+    }
+    let score = 0;
+    const b = state.board;
+    for (let i = 0; i < 64; i++) {
+      const p = b[i];
+      if (!p) continue;
+      const color = p[0];
+      const type = p[1];
+      const val = PIECE_VAL[type];
+      const pstIdx = color === 'w' ? i : ((7 - Math.floor(i / 8)) * 8 + (i % 8));
+      const posBonus = PST[type][pstIdx];
+      score += color === 'w' ? (val + posBonus) : -(val + posBonus);
+    }
+    if (isCheck) score += state.turn === 'w' ? -35 : 35;
+    return Math.round(score);
+  }
+
+  function readNotation(pgnText) {
+    const headers = Object.create(null);
+    let body = pgnText.replace(/\[(\w+)\s+"((?:\\.|[^"\\])*)"\s*\]/g, (_, key, value) => {
+      headers[key] = value.replace(/\\(["\\])/g, '$1');
+      return ' ';
+    });
+    body = body.replace(/\{[^}]*\}|;[^\r\n]*/g, ' ');
+    // Strip nested parentheses cleanly
+    let prev;
+    do {
+      prev = body;
+      body = body.replace(/\([^()]*\)/g, ' ');
+    } while (body !== prev);
+    body = body.replace(/\$\d+/g, ' ');
+    body = body.replace(/\d+\.(\.\.)?/g, ' ');
+    const tokens = body.trim().split(/\s+/).filter(Boolean);
+    const isResult = /^(1-0|0-1|1\/2-1\/2|\*)$/;
+    if (!headers.Result && tokens.length && isResult.test(tokens[tokens.length - 1])) {
+      headers.Result = tokens[tokens.length - 1];
+    }
+    return { headers, moves: tokens.filter(token => !isResult.test(token)) };
+  }
+
+  function buildGame({ headers, moves: tokens }, curatedBeats) {
+    if (!tokens.length) {
+      throw new Error('No chess moves found in PGN text.');
+    }
+
+    let state = createInitialState();
+    const initialEval = evaluatePosition(state, false, false);
+    const frames = [{
+      ply: 0,
+      moveNumber: 0,
+      side: null,
+      san: 'Start',
+      from: -1,
+      to: -1,
+      board: state.board.slice(),
+      turn: state.turn,
+      evalCp: initialEval,
+      evalSwing: 0,
+      isCapture: false,
+      isCheck: false,
+      isMate: false,
+      isCastle: false,
+      pacing: (curatedBeats && curatedBeats[0] && curatedBeats[0].pacing) || 'normal',
+      curated: (curatedBeats && curatedBeats[0]) || null
+    }];
+
+    for (let idx = 0; idx < tokens.length; idx++) {
+      const san = tokens[idx];
+      const move = matchSanMove(state, san);
+      if (!move) {
+        throw new Error(`Could not parse move "${san}" at ply ${idx + 1}. Check PGN formatting.`);
+      }
+      const moveNum = Math.floor(idx / 2) + 1;
+      const side = state.turn === 'w' ? 'White' : 'Black';
+      const nextState = applyMoveRaw(state, move);
+      const oppLegal = generateLegalMoves(nextState);
+      const inCheck = isKingInCheck(nextState.board, nextState.turn);
+      const isMate = inCheck && oppLegal.length === 0;
+      const evalCp = evaluatePosition(nextState, isMate, inCheck);
+      const prevEval = frames[frames.length - 1].evalCp;
+      const evalSwing = evalCp - prevEval;
+      const ply = idx + 1;
+
+      const curated = (curatedBeats && curatedBeats[ply]) || null;
+      let pacing = 'fast';
+      if (curated && curated.pacing) {
+        pacing = curated.pacing;
+      } else if (isMate || inCheck || Math.abs(evalSwing) >= 120) {
+        pacing = 'dramatic';
+      } else if (move.capture || move.castle || ply <= 4 || ply === tokens.length) {
+        pacing = 'normal';
+      }
+
+      frames.push({
+        ply,
+        moveNumber: moveNum,
+        side,
+        san,
+        from: move.from,
+        to: move.to,
+        piece: move.piece,
+        board: nextState.board.slice(),
+        turn: nextState.turn,
+        evalCp,
+        evalSwing,
+        isCapture: !!move.capture,
+        isCheck: inCheck,
+        isMate,
+        isCastle: !!move.castle,
+        pacing,
+        curated
+      });
+      state = nextState;
+    }
+
+    return { headers, frames };
+  }
+
+  // =========================================================================
+  // 3. DYNAMIC STORYTELLING SCRIPT GENERATOR (3 PERSONAS)
+  // =========================================================================
+  const PIECE_NAMES = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' };
+
+  function generateNarration(frame, headers, style) {
+    if (frame.curated && frame.curated[style]) {
+      return frame.curated[style];
+    }
+
+    const white = headers.White || 'White';
+    const black = headers.Black || 'Black';
+    const actor = frame.side === 'White' ? white : black;
+    const opp = frame.side === 'White' ? black : white;
+    const targetSq = frame.to >= 0 ? indexToSq(frame.to) : '';
+    const pieceName = PIECE_NAMES[frame.piece] || 'piece';
+
+    if (frame.ply === 0) {
+      if (style === 'shorts') return `${white} versus ${black}—let's break down every crucial moment!`;
+      if (style === 'coach') return `Starting position for ${white} against ${black}. Watch how both sides fight for the center and king safety.`;
+      return `The pieces are set for ${white} versus ${black}. Let's follow the story of this game move by move.`;
+    }
+
+    if (frame.isMate) {
+      if (style === 'shorts') return `${frame.san}! CHECKMATE! ${actor} closes the show with an unstoppable knockout!`;
+      if (style === 'coach') return `${frame.san} delivers checkmate. ${opp}'s king has no escape squares left.`;
+      return `${frame.san}—and that is checkmate! ${actor} finishes the battle in decisive fashion.`;
+    }
+
+    if (frame.isCheck) {
+      if (style === 'shorts') return `${frame.san} with CHECK! ${actor} cranks up the pressure on ${opp}'s king!`;
+      if (style === 'coach') return `${frame.san} puts the enemy king in check, forcing an immediate defensive response.`;
+      return `Move ${frame.moveNumber}: ${actor} strikes with ${frame.san}, putting ${opp}'s king in check and seizing the initiative.`;
+    }
+
+    if (frame.isCastle) {
+      const sideWord = frame.san.includes('O-O-O') ? 'queenside' : 'kingside';
+      if (style === 'shorts') return `${actor} castles ${sideWord}—king tucked away, rook enters the fight!`;
+      if (style === 'coach') return `${frame.san}: ${actor} castles ${sideWord}, securing the king and activating the rook.`;
+      return `${actor} castles ${sideWord}, getting the king to safety as the tension builds.`;
+    }
+
+    if (Math.abs(frame.evalSwing) >= 180) {
+      const bigWord = frame.isCapture ? 'bold capture' : 'huge turning point';
+      if (style === 'shorts') return `HOLD ON! ${frame.san} changes everything—a ${bigWord} that flips the evaluation bar!`;
+      if (style === 'coach') return `Critical moment on move ${frame.moveNumber}: ${frame.san} shifts the evaluation sharply by ${(Math.abs(frame.evalSwing) / 100).toFixed(1)} pawns.`;
+      return `Turning point! ${actor} plays ${frame.san}, a ${bigWord} on ${targetSq} that dramatically tilts the balance of the game.`;
+    }
+
+    if (frame.isCapture) {
+      if (style === 'shorts') return `${frame.san}—pieces fly off the board on ${targetSq}!`;
+      if (style === 'coach') return `${frame.san} captures on ${targetSq}, reshaping the pawn structure and opening lines.`;
+      return `${actor} captures on ${targetSq} with ${frame.san}, trading down and clarifying the battle.`;
+    }
+
+    if (frame.ply <= 10) {
+      if (style === 'shorts') return `${frame.san}—clean opening development.`;
+      if (style === 'coach') return `${frame.san} develops the ${pieceName} to ${targetSq}, fighting for central control.`;
+      return `${actor} develops the ${pieceName} to ${targetSq} with ${frame.san}.`;
+    }
+
+    if (style === 'shorts') return `${frame.san}—${actor} repositions the ${pieceName} to ${targetSq}.`;
+    if (style === 'coach') return `${frame.san} improves the ${pieceName}'s placement on ${targetSq}.`;
+    return `${actor} maneuvers the ${pieceName} to ${targetSq} with ${frame.san}, probing for an edge.`;
+  }
+
+  // =========================================================================
+  // 4. CRISP STAUNTON-INSPIRED SVG CHESS PIECES
+  // =========================================================================
+  function getPieceSVG(code) {
+    const isW = code[0] === 'w';
+    const fill = isW ? '#FFFFFF' : '#1E293B';
+    const stroke = isW ? '#1E293B' : '#F8FAFC';
+    const detail = isW ? '#334155' : '#94A3B8';
+    const type = code[1];
+
+    const shapes = {
+      p: `<circle cx="22.5" cy="14" r="5.5" fill="${fill}" stroke="${stroke}" stroke-width="2"/>
+          <path d="M16 25 C16 20 29 20 29 25 L31 35 L14 35 Z" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="11" y="35" width="23" height="4.5" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`,
+      r: `<path d="M12 10 H16 V14 H20 V10 H25 V14 H29 V10 H33 V18 L30 21 V33 L33 36 V39 H12 V36 L15 33 V21 L12 18 Z" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>
+          <line x1="15" y1="21" x2="30" y2="21" stroke="${detail}" stroke-width="1.5"/>
+          <line x1="15" y1="33" x2="30" y2="33" stroke="${detail}" stroke-width="1.5"/>`,
+      n: `<path d="M14 36 C14 27 18 24 19 20 L13 21 L11 18 L18 11 C21 9 27 9 30 13 C33 17 34 25 32 36 Z" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="20.5" cy="14.5" r="1.5" fill="${stroke}"/>
+          <rect x="11" y="36" width="23" height="3.5" rx="1.5" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`,
+      b: `<circle cx="22.5" cy="8.5" r="2.5" fill="${fill}" stroke="${stroke}" stroke-width="1.8"/>
+          <path d="M22.5 11 C16 15 14 22 17 28 L15 35 H30 L28 28 C31 22 29 15 22.5 11 Z" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M19 20 L26 20 M22.5 16.5 L22.5 23.5" stroke="${detail}" stroke-width="1.6" stroke-linecap="round"/>
+          <rect x="11" y="35" width="23" height="4" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`,
+      q: `<circle cx="9" cy="14" r="2.2" fill="${fill}" stroke="${stroke}" stroke-width="1.6"/>
+          <circle cx="16" cy="10" r="2.2" fill="${fill}" stroke="${stroke}" stroke-width="1.6"/>
+          <circle cx="22.5" cy="8.5" r="2.2" fill="${fill}" stroke="${stroke}" stroke-width="1.6"/>
+          <circle cx="29" cy="10" r="2.2" fill="${fill}" stroke="${stroke}" stroke-width="1.6"/>
+          <circle cx="36" cy="14" r="2.2" fill="${fill}" stroke="${stroke}" stroke-width="1.6"/>
+          <path d="M10 16 L15 26 L16.5 12.5 L21 25 L22.5 11 L24 25 L28.5 12.5 L30 26 L35 16 L31 35 H14 Z" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="11" y="35" width="23" height="4" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`,
+      k: `<path d="M22.5 6 V14 M18.5 10 H26.5" stroke="${stroke}" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M22.5 15 C15 15 11 20 13 27 L15 35 H30 L32 27 C34 20 30 15 22.5 15 Z" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>
+          <line x1="22.5" y1="16" x2="22.5" y2="31" stroke="${detail}" stroke-width="1.4"/>
+          <rect x="11" y="35" width="23" height="4" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`
+    };
+    return `<svg viewBox="0 0 45 45" class="chess-piece" aria-hidden="true">${shapes[type] || ''}</svg>`;
+  }
+
+  // =========================================================================
+  // 5. WEB AUDIO API SYNTHESIZED CHESS SFX
+  // =========================================================================
+  let audioCtx = null;
+
+  function ensureAudioCtx() {
+    if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new Ctx();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+  }
+
+  function playPieceSfx(frame) {
+    if (!appState.sfxEnabled || frame.ply === 0) return;
+    ensureAudioCtx();
+    if (!audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (frame.isMate || frame.isCheck) {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(frame.isMate ? 620 : 520, now);
+      osc.frequency.exponentialRampToValueAtTime(frame.isMate ? 880 : 320, now + 0.18);
+      gain.gain.setValueAtTime(0.16, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      osc.start(now);
+      osc.stop(now + 0.23);
+    } else if (frame.isCapture) {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(210, now);
+      osc.frequency.exponentialRampToValueAtTime(75, now + 0.09);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(290, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.06);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    }
+  }
+
+  // =========================================================================
+  // 6. APPLICATION STATE & RENDERING
+  // =========================================================================
+  const appState = {
+    game: null,
+    currentPly: 0,
+    flipped: false,
+    isPlaying: false,
+    waitingForBroadcast: false,
+    voiceEnabled: true,
+    sfxEnabled: true,
+    style: 'storyteller',
+    speed: 1.0,
+    playTimer: null,
+    speakDelayTimer: null,
+    currentUtterance: null,
+    voices: [],
+    selectedVoiceURI: '',
+    speechBlockedNotified: false,
+    activePreset: 'championship'
+  };
+
+  const els = {
+    boardGrid: document.getElementById('board-grid'),
+    arrowGroup: document.getElementById('arrow-group'),
+    evalFill: document.getElementById('eval-white-fill'),
+    evalLabel: document.getElementById('eval-score-label'),
+    matchEvent: document.getElementById('match-event'),
+    matchPlayers: document.getElementById('match-players'),
+    matchResult: document.getElementById('match-result'),
+    matchOpening: document.getElementById('match-opening'),
+    topName: document.getElementById('top-player-name'),
+    topElo: document.getElementById('top-player-elo'),
+    topDot: document.getElementById('top-color-dot'),
+    topTurn: document.getElementById('top-turn-pill'),
+    botName: document.getElementById('bottom-player-name'),
+    botElo: document.getElementById('bottom-player-elo'),
+    botDot: document.getElementById('bottom-color-dot'),
+    botTurn: document.getElementById('bottom-turn-pill'),
+    playBtn: document.getElementById('btn-play'),
+    playIcon: document.getElementById('play-icon'),
+    playLabel: document.getElementById('play-label'),
+    eq: document.getElementById('eq-indicator'),
+    moveTitleBadge: document.getElementById('move-title-badge'),
+    pacingBadge: document.getElementById('pacing-badge'),
+    narrationText: document.getElementById('narration-text'),
+    sparkline: document.getElementById('sparkline-svg'),
+    turningCount: document.getElementById('turning-point-count'),
+    moveList: document.getElementById('move-list'),
+    voiceToggle: document.getElementById('btn-voice-toggle'),
+    sfxToggle: document.getElementById('btn-sfx-toggle'),
+    voiceSelect: document.getElementById('voice-select'),
+    btnTestVoice: document.getElementById('btn-test-voice'),
+    modal: document.getElementById('pgn-modal'),
+    pgnTextarea: document.getElementById('pgn-textarea'),
+    pgnFile: document.getElementById('pgn-file-input'),
+    fileNameLabel: document.getElementById('file-name-label'),
+    pgnError: document.getElementById('pgn-error'),
+    toast: document.getElementById('toast'),
+    championshipGame: document.getElementById('championship-game'),
+    championshipStatus: document.getElementById('championship-status'),
+    btnPresetOpera: document.getElementById('btn-preset-opera')
+  };
+
+  let toastTimer = null;
+  function showToast(msg) {
+    els.toast.textContent = msg;
+    els.toast.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => els.toast.classList.add('hidden'), 2600);
+  }
+
+  function formatEvalText(cp, isMate, turn) {
+    if (isMate) return 'M#';
+    const pawns = cp / 100;
+    const sign = pawns > 0 ? '+' : '';
+    return sign + pawns.toFixed(1);
+  }
+
+  function renderPlayerBars() {
+    const h = appState.game.headers;
+    const wName = h.White || 'White';
+    const bName = h.Black || 'Black';
+    const wElo = h.WhiteElo ? `(${h.WhiteElo})` : '';
+    const bElo = h.BlackElo ? `(${h.BlackElo})` : '';
+    const frame = appState.game.frames[appState.currentPly];
+
+    if (!appState.flipped) {
+      els.topName.textContent = bName;
+      els.topElo.textContent = bElo;
+      els.topDot.className = 'w-3 h-3 rounded-sm bg-slate-950 border border-slate-500 inline-block';
+      els.botName.textContent = wName;
+      els.botElo.textContent = wElo;
+      els.botDot.className = 'w-3 h-3 rounded-sm bg-slate-100 border border-slate-400 inline-block';
+      els.topTurn.classList.toggle('hidden', frame.turn !== 'b' || frame.isMate);
+      els.botTurn.classList.toggle('hidden', frame.turn !== 'w' || frame.isMate);
+    } else {
+      els.topName.textContent = wName;
+      els.topElo.textContent = wElo;
+      els.topDot.className = 'w-3 h-3 rounded-sm bg-slate-100 border border-slate-400 inline-block';
+      els.botName.textContent = bName;
+      els.botElo.textContent = bElo;
+      els.botDot.className = 'w-3 h-3 rounded-sm bg-slate-950 border border-slate-500 inline-block';
+      els.topTurn.classList.toggle('hidden', frame.turn !== 'w' || frame.isMate);
+      els.botTurn.classList.toggle('hidden', frame.turn !== 'b' || frame.isMate);
+    }
+  }
+
+  function renderBoard() {
+    const frame = appState.game.frames[appState.currentPly];
+    const isDramatic = frame.pacing === 'dramatic' && frame.ply > 0;
+    let html = '';
+
+    for (let visRow = 0; visRow < 8; visRow++) {
+      for (let visCol = 0; visCol < 8; visCol++) {
+        const r = appState.flipped ? 7 - visRow : visRow;
+        const c = appState.flipped ? 7 - visCol : visCol;
+        const sqIdx = r * 8 + c;
+        const isLight = (r + c) % 2 === 0;
+        let sqClass = isLight ? 'sq-light' : 'sq-dark';
+
+        if (sqIdx === frame.from || sqIdx === frame.to) {
+          if (isDramatic) {
+            sqClass = isLight ? 'sq-dramatic-light' : 'sq-dramatic-dark';
+          } else {
+            sqClass = isLight ? 'sq-hl-light' : 'sq-hl-dark';
+          }
+        }
+
+        const piece = frame.board[sqIdx];
+        const rankLabel = visCol === 0
+          ? `<span class="absolute top-0.5 left-1 text-[10px] font-bold ${isLight ? 'text-emerald-900/70' : 'text-amber-50/75'} select-none pointer-events-none">${8 - r}</span>`
+          : '';
+        const fileLabel = visRow === 7
+          ? `<span class="absolute bottom-0.5 right-1 text-[10px] font-bold ${isLight ? 'text-emerald-900/70' : 'text-amber-50/75'} select-none pointer-events-none">${FILES[c]}</span>`
+          : '';
+
+        html += `<div class="relative flex items-center justify-center ${sqClass}">${rankLabel}${fileLabel}${piece ? getPieceSVG(piece) : ''}</div>`;
+      }
+    }
+    els.boardGrid.innerHTML = html;
+
+    // Render SVG Move Arrow
+    if (frame.from >= 0 && frame.to >= 0) {
+      const fRow = Math.floor(frame.from / 8), fCol = frame.from % 8;
+      const tRow = Math.floor(frame.to / 8), tCol = frame.to % 8;
+      const x1 = ((appState.flipped ? 7 - fCol : fCol) + 0.5) * 100;
+      const y1 = ((appState.flipped ? 7 - fRow : fRow) + 0.5) * 100;
+      const x2 = ((appState.flipped ? 7 - tCol : tCol) + 0.5) * 100;
+      const y2 = ((appState.flipped ? 7 - tRow : tRow) + 0.5) * 100;
+      const dx = x2 - x1, dy = y2 - y1;
+      const len = Math.hypot(dx, dy) || 1;
+      const shorten = 22;
+      const ex = x2 - (dx / len) * shorten;
+      const ey = y2 - (dy / len) * shorten;
+
+      const strokeColor = isDramatic ? 'rgba(245, 158, 11, 0.92)' : 'rgba(16, 185, 129, 0.78)';
+      const marker = isDramatic ? 'url(#head-dramatic)' : 'url(#head-normal)';
+      els.arrowGroup.innerHTML = `<line x1="${x1}" y1="${y1}" x2="${ex}" y2="${ey}" stroke="${strokeColor}" stroke-width="14" stroke-linecap="round" marker-end="${marker}" />`;
+    } else {
+      els.arrowGroup.innerHTML = '';
+    }
+
+    // Update Eval Bar
+    const clampedCp = Math.max(-800, Math.min(800, frame.evalCp));
+    const whitePct = Math.round(50 + (clampedCp / 800) * 46);
+    els.evalFill.style.height = `${whitePct}%`;
+    els.evalLabel.textContent = formatEvalText(frame.evalCp, frame.isMate, frame.turn);
+    if (whitePct < 20) {
+      els.evalLabel.className = 'absolute inset-x-0 top-1.5 text-center font-mono-num text-[10px] font-bold text-slate-100 leading-none';
+    } else {
+      els.evalLabel.className = 'absolute inset-x-0 bottom-1.5 text-center font-mono-num text-[10px] font-bold text-slate-900 leading-none';
+    }
+
+    renderPlayerBars();
+  }
+
+  function renderTeleprompter() {
+    const frame = appState.game.frames[appState.currentPly];
+    const text = generateNarration(frame, appState.game.headers, appState.style);
+    els.narrationText.textContent = text;
+
+    if (frame.ply === 0) {
+      els.moveTitleBadge.textContent = 'Start Position';
+    } else {
+      const dots = frame.side === 'White' ? '.' : '...';
+      els.moveTitleBadge.textContent = `${frame.moveNumber}${dots} ${frame.san}`;
+    }
+
+    const pStyles = {
+      fast:     { label: 'FAST PACE', cls: 'bg-slate-800 text-slate-300 border-slate-700' },
+      normal:   { label: 'STEADY',    cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40' },
+      dramatic: { label: 'CRUCIAL MOMENT', cls: 'bg-amber-500/20 text-amber-300 border-amber-500/50' }
+    };
+    const badge = pStyles[frame.pacing] || pStyles.normal;
+    els.pacingBadge.textContent = frame.ply === 0 ? 'INTRO' : badge.label;
+    els.pacingBadge.className = `text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${badge.cls}`;
+  }
+
+  function renderSparkline() {
+    const frames = appState.game.frames;
+    const n = Math.max(1, frames.length - 1);
+    const points = frames.map((f, i) => {
+      const x = (i / n) * 400;
+      const clamped = Math.max(-700, Math.min(700, f.evalCp));
+      const y = 40 - (clamped / 700) * 34;
+      return { x, y, f, i };
+    });
+
+    const poly = points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    const area = `0,40 ${poly} 400,40`;
+    const curr = points[appState.currentPly] || points[0];
+
+    const dramaticDots = points
+      .filter(p => p.i > 0 && p.f.pacing === 'dramatic')
+      .map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="#F59E0B" />`)
+      .join('');
+
+    els.sparkline.innerHTML = `
+      <line x1="0" y1="40" x2="400" y2="40" stroke="#334155" stroke-width="1" stroke-dasharray="4 4" />
+      <polygon points="${area}" fill="rgba(16, 185, 129, 0.16)" />
+      <polyline points="${poly}" fill="none" stroke="#10B981" stroke-width="2" stroke-linejoin="round" />
+      ${dramaticDots}
+      <line x1="${curr.x.toFixed(1)}" y1="0" x2="${curr.x.toFixed(1)}" y2="80" stroke="#F8FAFC" stroke-width="1.2" opacity="0.55" />
+      <circle cx="${curr.x.toFixed(1)}" cy="${curr.y.toFixed(1)}" r="5" fill="#FFFFFF" stroke="#0F172A" stroke-width="2" />
+    `;
+  }
+
+  function renderMoveList() {
+    const frames = appState.game.frames;
+    let html = '';
+    for (let i = 1; i < frames.length; i += 2) {
+      const w = frames[i];
+      const b = frames[i + 1];
+      const wActive = appState.currentPly === w.ply;
+      const bActive = b && appState.currentPly === b.ply;
+      const wDot = w.pacing === 'dramatic' ? '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block ml-1.5"></span>' : '';
+      const bDot = b && b.pacing === 'dramatic' ? '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block ml-1.5"></span>' : '';
+
+      html += `
+        <div class="grid grid-cols-12 items-center rounded-lg px-2 py-1 text-xs font-mono-num">
+          <span class="col-span-2 text-slate-500">${w.moveNumber}.</span>
+          <button type="button" data-ply="${w.ply}" class="col-span-5 text-left px-2 py-1 rounded-md transition flex items-center ${wActive ? 'bg-emerald-600 text-white font-semibold' : 'text-slate-200 hover:bg-slate-800'}">
+            ${w.san}${wDot}
+          </button>
+          ${b ? `<button type="button" data-ply="${b.ply}" class="col-span-5 text-left px-2 py-1 rounded-md transition flex items-center ${bActive ? 'bg-emerald-600 text-white font-semibold' : 'text-slate-200 hover:bg-slate-800'}">
+            ${b.san}${bDot}
+          </button>` : '<span class="col-span-5"></span>'}
+        </div>`;
+    }
+    els.moveList.innerHTML = html;
+
+    const activeBtn = els.moveList.querySelector(`button[data-ply="${appState.currentPly}"]`);
+    if (activeBtn) {
+      const list = els.moveList.getBoundingClientRect();
+      const active = activeBtn.getBoundingClientRect();
+      if (active.top < list.top) els.moveList.scrollTop += active.top - list.top;
+      else if (active.bottom > list.bottom) els.moveList.scrollTop += active.bottom - list.bottom;
+    }
+  }
+
+  function renderAll() {
+    renderBoard();
+    renderTeleprompter();
+    renderSparkline();
+    renderMoveList();
+  }
+
+  // =========================================================================
+  // 7. LIVE AUDIO BOT PLAYBACK, VOICE LOADING & DYNAMIC PACING ENGINE
+  // =========================================================================
+  function populateVoices() {
+    if (!('speechSynthesis' in window)) {
+      els.voiceSelect.innerHTML = '<option value="">Browser speech unavailable</option>';
+      return;
+    }
+    const rawVoices = window.speechSynthesis.getVoices() || [];
+    appState.voices = rawVoices;
+    if (!rawVoices.length) {
+      els.voiceSelect.innerHTML = '<option value="">Default system voice (loading...)</option>';
+      return;
+    }
+
+    // Prefer natural English voices first
+    const sorted = rawVoices.slice().sort((a, b) => {
+      const aEn = /^en/i.test(a.lang) ? 0 : 1;
+      const bEn = /^en/i.test(b.lang) ? 0 : 1;
+      if (aEn !== bEn) return aEn - bEn;
+      const aGood = /(Google|Natural|Samantha|Daniel|Alex|Microsoft|Aria|Guy)/i.test(a.name) ? 0 : 1;
+      const bGood = /(Google|Natural|Samantha|Daniel|Alex|Microsoft|Aria|Guy)/i.test(b.name) ? 0 : 1;
+      return aGood - bGood;
+    });
+
+    if (!appState.selectedVoiceURI && sorted.length) {
+      appState.selectedVoiceURI = sorted[0].voiceURI;
+    }
+
+    els.voiceSelect.innerHTML = sorted.map(v => {
+      const sel = v.voiceURI === appState.selectedVoiceURI ? 'selected' : '';
+      return `<option value="${v.voiceURI.replace(/"/g, '&quot;')}" ${sel}>${v.name} (${v.lang})</option>`;
+    }).join('');
+  }
+
+  if ('speechSynthesis' in window) {
+    populateVoices();
+    window.speechSynthesis.onvoiceschanged = populateVoices;
+  }
+
+  function getActiveVoice() {
+    if (!appState.voices.length && 'speechSynthesis' in window) {
+      appState.voices = window.speechSynthesis.getVoices() || [];
+    }
+    if (!appState.voices.length) return null;
+    return appState.voices.find(v => v.voiceURI === appState.selectedVoiceURI)
+      || appState.voices.find(v => /^en/i.test(v.lang))
+      || appState.voices[0];
+  }
+
+  function speakText(text, rate, pitch, onDone, isPlaySession) {
+    if (!('speechSynthesis' in window)) {
+      if (onDone) onDone();
+      return;
+    }
+    const synth = window.speechSynthesis;
+    clearTimeout(appState.speakDelayTimer);
+
+    const needsCancel = synth.speaking || synth.pending;
+    if (needsCancel) {
+      synth.cancel();
+    }
+
+    // Small delay after cancel() avoids Chrome's silent-drop bug
+    const launch = () => {
+      if (isPlaySession && !appState.isPlaying) return;
+      try { synth.resume(); } catch (_) {}
+
+      const utter = new SpeechSynthesisUtterance(text);
+      const voice = getActiveVoice();
+      if (voice) {
+        utter.voice = voice;
+        utter.lang = voice.lang || 'en-US';
+      } else {
+        utter.lang = 'en-US';
+      }
+      utter.volume = 1.0;
+      utter.rate = rate;
+      utter.pitch = pitch;
+
+      // Hold reference on appState to prevent Chrome GC mid-speech
+      appState.currentUtterance = utter;
+
+      let settled = false;
+      let started = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        els.eq.classList.add('eq-paused');
+        if (onDone) onDone();
+      };
+
+      utter.onstart = () => {
+        started = true;
+        els.eq.classList.remove('eq-paused');
+      };
+      utter.onend = finish;
+      utter.onerror = (ev) => {
+        if (ev && ev.error && ev.error !== 'interrupted' && ev.error !== 'canceled' && !appState.speechBlockedNotified) {
+          appState.speechBlockedNotified = true;
+          showToast('Voice playback was blocked by this browser preview — captions will still auto-advance.');
+        }
+        finish();
+      };
+
+      synth.speak(utter);
+
+      // Detect silent/blocked speech engine quickly and fall back to reading pace
+      const readMs = Math.max(2200, Math.round((text.split(/\s+/).length * 360) / appState.speed) + 900);
+      clearTimeout(appState.playTimer);
+      appState.playTimer = setTimeout(() => {
+        if (!settled) {
+          if (!started && !appState.speechBlockedNotified) {
+            appState.speechBlockedNotified = true;
+            showToast('Browser TTS unavailable in this preview — try Test Voice or open in a full tab.');
+          }
+          finish();
+        }
+      }, readMs + 1800);
+    };
+
+    if (needsCancel) {
+      appState.speakDelayTimer = setTimeout(launch, 60);
+    } else {
+      launch();
+    }
+  }
+
+  function stopPlayback() {
+    appState.isPlaying = false;
+    appState.waitingForBroadcast = false;
+    clearTimeout(appState.playTimer);
+    clearTimeout(appState.speakDelayTimer);
+    appState.currentUtterance = null;
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    els.playIcon.innerHTML = '&#9654;';
+    els.playLabel.textContent = 'Narrate';
+    els.eq.classList.add('eq-paused');
+  }
+
+  function scheduleNextMove(delayMs) {
+    clearTimeout(appState.playTimer);
+    appState.playTimer = setTimeout(() => {
+      if (!appState.isPlaying) return;
+      if (appState.currentPly < appState.game.frames.length - 1) {
+        appState.currentPly++;
+        playCurrentPly(true);
+      } else if (appState.activePreset === 'championship' && appState.game.headers.Result === '*') {
+        appState.waitingForBroadcast = true;
+        els.playLabel.textContent = 'Waiting for move';
+      } else {
+        stopPlayback();
+        showToast('Story complete! Replay or paste another PGN.');
+      }
+    }, delayMs);
+  }
+
+  function playCurrentPly(autoAdvance) {
+    renderAll();
+    const frame = appState.game.frames[appState.currentPly];
+    playPieceSfx(frame);
+
+    const text = generateNarration(frame, appState.game.headers, appState.style);
+    const basePause = frame.pacing === 'dramatic' ? 950 : frame.pacing === 'normal' ? 450 : 250;
+    const adjustedPause = Math.round(basePause / appState.speed);
+
+    if (appState.voiceEnabled && 'speechSynthesis' in window) {
+      const paceMult = frame.pacing === 'dramatic' ? 0.94 : frame.pacing === 'fast' ? 1.15 : 1.02;
+      const rate = Math.min(2.0, Math.max(0.65, paceMult * appState.speed));
+      const pitch = frame.pacing === 'dramatic' ? 1.04 : 1.0;
+      speakText(text, rate, pitch, () => {
+        if (autoAdvance && appState.isPlaying) {
+          scheduleNextMove(adjustedPause);
+        }
+      }, true);
+    } else if (autoAdvance && appState.isPlaying) {
+      const readMs = Math.max(900, Math.round((text.split(/\s+/).length * 240) / appState.speed)) + adjustedPause;
+      scheduleNextMove(readMs);
+    }
+  }
+
+  function togglePlay() {
+    pinChampionshipReplay();
+    ensureAudioCtx();
+    if (appState.isPlaying) {
+      stopPlayback();
+      return;
+    }
+    const isLive = appState.activePreset === 'championship' && appState.game.headers.Result === '*';
+    if (!isLive && appState.currentPly >= appState.game.frames.length - 1) {
+      appState.currentPly = 0;
+    }
+    appState.isPlaying = true;
+    els.playIcon.innerHTML = '&#10074;&#10074;';
+    els.playLabel.textContent = 'Pause';
+    playCurrentPly(true);
+  }
+
+  function jumpToPly(ply) {
+    pinChampionshipReplay();
+    stopPlayback();
+    appState.currentPly = Math.max(0, Math.min(appState.game.frames.length - 1, ply));
+    renderAll();
+    playPieceSfx(appState.game.frames[appState.currentPly]);
+  }
+
+  function loadGame(pgnText, curatedBeats, presetKey) {
+    const parsed = buildGame(readNotation(pgnText), curatedBeats);
+    stopPlayback();
+    displayGame(parsed, presetKey, 0);
+  }
+
+  function displayGame(parsed, presetKey, ply) {
+    appState.game = parsed;
+    appState.currentPly = ply;
+    appState.activePreset = presetKey || null;
+
+    const h = parsed.headers;
+    const roundStr = h.Round ? ` · Round ${h.Round}` : '';
+    els.matchEvent.textContent = (h.Event || 'Custom PGN Game') + roundStr;
+    els.matchPlayers.textContent = `${h.White || 'White'} vs. ${h.Black || 'Black'}`;
+    els.matchResult.textContent = presetKey === 'championship' && h.Result === '*' ? 'In progress' : h.Result || '*';
+    els.matchOpening.textContent = h.Opening || `${Math.ceil((parsed.frames.length - 1) / 2)} moves`;
+
+    const dramaticCount = parsed.frames.filter(f => f.ply > 0 && f.pacing === 'dramatic').length;
+    els.turningCount.textContent = `${dramaticCount} crucial moment${dramaticCount === 1 ? '' : 's'}`;
+
+    // Highlight active preset button
+    els.championshipGame.value = presetKey === 'championship' ? championshipChoice : '';
+    els.btnPresetOpera.className = presetKey === 'opera_1858'
+      ? 'px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-500 transition'
+      : 'px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition';
+
+    renderAll();
+  }
+
+  // The Lichess tournament export contains all rounds, including empty future boards.
+  const championshipUrl = 'https://lichess.org/api/broadcast/qfkdt8mn.pgn';
+  const cacheKey = 'chess-audio-storyteller:wcc2026:v1';
+  const refreshInterval = 60_000;
+  const championshipGames = new Map();
+  const gameTwoMoves = readNotation(PRESETS.wcc2026_g2.pgn).moves.join(' ');
+  let championshipChoice = 'latest';
+  let displayedGameId = null;
+  let lastChecked = 0;
+  let nextCheck = 0;
+  let syncTimer;
+  let syncing = false;
+  let retryDelay = refreshInterval;
+
+  function playerName(name = '') {
+    if (/gukesh/i.test(name)) return 'Gukesh Dommaraju';
+    if (/sindarov/i.test(name)) return 'Javokhir Sindarov';
+    return '';
+  }
+
+  function addChampionshipGame({ headers, moves }) {
+    if (!Array.isArray(moves) || !moves.length || !headers || !headers.Round) return false;
+    const white = playerName(headers.White);
+    const black = playerName(headers.Black);
+    if (!white || !black || white === black) return false;
+
+    const round = headers.Round.replace(/^(\d+)\.1$/, '$1');
+    const chapter = /\/([A-Za-z0-9]{8})\/?$/.exec(headers.GameURL || '');
+    const id = chapter ? chapter[1] : 'round-' + round;
+    const notation = { headers: {
+      Event: 'FIDE World Chess Championship 2026', Round: round, White: white, Black: black,
+      WhiteElo: headers.WhiteElo || '', BlackElo: headers.BlackElo || '', Opening: headers.Opening || '',
+      GameURL: headers.GameURL || '', Result: headers.Result || '*'
+    }, moves };
+    const signature = JSON.stringify(notation);
+    const previous = championshipGames.get(id);
+    if (previous && previous.signature === signature) return true;
+    // A delayed relay response can briefly show an already completed round as unfinished.
+    if (previous && previous.game.headers.Result !== '*' && notation.headers.Result === '*') return true;
+    const curated = round === '2' && white === 'Gukesh Dommaraju' && moves.join(' ') === gameTwoMoves
+      ? PRESETS.wcc2026_g2.curatedBeats : null;
+    const game = buildGame(notation, curated);
+    championshipGames.set(id, { id, round, game, notation, signature });
+    return true;
+  }
+
+  function pinChampionshipReplay() {
+    if (appState.activePreset === 'championship' && displayedGameId && championshipChoice === 'latest') {
+      championshipChoice = displayedGameId;
+      els.championshipGame.value = displayedGameId;
+    }
+  }
+
+  function updateChampionshipView() {
+    const rounds = [...championshipGames.values()].sort((a, b) =>
+      b.round.localeCompare(a.round, 'en', { numeric: true }));
+    if (!rounds.length) return;
+    const newest = rounds[0];
+    const picker = els.championshipGame;
+    const labels = rounds.map(({ id, round, game }) => {
+      const result = game.headers.Result;
+      const score = result === '1/2-1/2' ? 'Draw' : result === '*' ? 'In progress' : result;
+      return [id, `Game ${round} · ${score}`];
+    });
+    const listKey = JSON.stringify(labels);
+    if (picker.dataset.games !== listKey) {
+      const placeholder = new Option('World Championship', '');
+      placeholder.disabled = true;
+      placeholder.hidden = true;
+      picker.replaceChildren(placeholder, new Option(`World Championship · Latest (Game ${newest.round})`, 'latest'),
+        ...labels.map(([id, label]) => new Option(label, id)));
+      picker.dataset.games = listKey;
+    }
+    picker.value = appState.activePreset === 'championship' ? championshipChoice : '';
+    if (appState.activePreset !== 'championship') return;
+
+    const target = championshipGames.get(championshipChoice) || newest;
+    if (appState.game === target.game) return;
+    const lastPly = target.game.frames.length - 1;
+    const sameGame = displayedGameId === target.id && appState.game !== null;
+    let ply = 0;
+    if (sameGame) {
+      const wasAtLiveEdge = !appState.isPlaying && appState.game.headers.Result === '*' &&
+        appState.currentPly === appState.game.frames.length - 1;
+      ply = wasAtLiveEdge ? lastPly : Math.min(appState.currentPly, lastPly);
+    } else {
+      stopPlayback();
+      if (championshipChoice === 'latest' && target.game.headers.Result === '*') ply = lastPly;
+    }
+    displayedGameId = target.id;
+    displayGame(target.game, 'championship', ply);
+    if (appState.waitingForBroadcast && (ply < lastPly || target.game.headers.Result !== '*')) {
+      appState.waitingForBroadcast = false;
+      els.playLabel.textContent = 'Pause';
+      scheduleNextMove(0);
+    }
+  }
+
+  function checkedTime() {
+    return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric',
+      minute: '2-digit' }).format(new Date(lastChecked));
+  }
+
+  function savedStatus() {
+    return lastChecked ? 'Showing saved games from ' + checkedTime() : 'Showing the two bundled games';
+  }
+
+  function armChampionshipTimer() {
+    clearTimeout(syncTimer);
+    if (!document.hidden && !syncing) {
+      syncTimer = setTimeout(syncChampionship, Math.max(0, nextCheck - Date.now()));
+    }
+  }
+
+  async function syncChampionship() {
+    if (syncing || document.hidden) return;
+    if (Date.now() < nextCheck) return armChampionshipTimer();
+    syncing = true;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15_000);
+    let delay = refreshInterval;
+    try {
+      const response = await fetch(championshipUrl, { signal: controller.signal, credentials: 'omit' });
+      if (!response.ok) {
+        if (response.status === 429) {
+          const after = response.headers.get('Retry-After') || '';
+          delay = Math.max(120_000, Number(after) * 1000 || Date.parse(after) - Date.now() || 0);
+        }
+        throw new Error('Broadcast unavailable');
+      }
+      const chunks = (await response.text()).trim().split(/(?=^\[Event\s+")/m);
+      let gamesRead = 0;
+      let unreadable = false;
+      for (const chunk of chunks) {
+        try {
+          if (addChampionshipGame(readNotation(chunk))) gamesRead++;
+        } catch {
+          unreadable = true;
+        }
+      }
+      if (!gamesRead) throw new Error('No playable broadcast games');
+      updateChampionshipView();
+      lastChecked = Date.now();
+      retryDelay = refreshInterval;
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify({ checked: lastChecked,
+          games: [...championshipGames.values()].map(entry => entry.notation) }));
+      } catch { /* Browser storage is optional. */ }
+      els.championshipStatus.textContent = unreadable
+        ? 'Some moves are pending. Showing available games and retrying in a minute.'
+        : `${championshipGames.size} games · Checked ${checkedTime()} · Updates every minute`;
+    } catch {
+      delay = Math.max(delay, retryDelay);
+      retryDelay = Math.min(delay * 2, 15 * refreshInterval);
+      els.championshipStatus.textContent = `Broadcast unavailable. ${savedStatus()}. Retrying automatically.`;
+    } finally {
+      clearTimeout(timeout);
+      syncing = false;
+      nextCheck = Date.now() + delay;
+      armChampionshipTimer();
+    }
+  }
+
+  function startChampionship() {
+    addChampionshipGame(readNotation(PRESETS.wcc2026_g1.pgn));
+    addChampionshipGame(readNotation(PRESETS.wcc2026_g2.pgn));
+    try {
+      const saved = JSON.parse(localStorage.getItem(cacheKey));
+      if (saved && Array.isArray(saved.games) && Number.isFinite(saved.checked)) {
+        for (const game of saved.games) addChampionshipGame(game);
+        lastChecked = saved.checked;
+      }
+    } catch { /* The bundled rounds remain available on a first visit or after a cache reset. */ }
+    updateChampionshipView();
+    els.championshipStatus.textContent = savedStatus() + ' · Checking Lichess…';
+    document.addEventListener('visibilitychange', armChampionshipTimer);
+    window.addEventListener('online', armChampionshipTimer);
+    armChampionshipTimer();
+  }
+
+  // =========================================================================
+  // 8. EVENT LISTENERS
+  // =========================================================================
+  els.playBtn.addEventListener('click', togglePlay);
+  document.getElementById('btn-first').addEventListener('click', () => jumpToPly(0));
+  document.getElementById('btn-prev').addEventListener('click', () => jumpToPly(appState.currentPly - 1));
+  document.getElementById('btn-next').addEventListener('click', () => jumpToPly(appState.currentPly + 1));
+  document.getElementById('btn-last').addEventListener('click', () => jumpToPly(appState.game.frames.length - 1));
+
+  document.getElementById('btn-flip').addEventListener('click', () => {
+    appState.flipped = !appState.flipped;
+    renderBoard();
+  });
+
+  els.voiceToggle.addEventListener('click', () => {
+    appState.voiceEnabled = !appState.voiceEnabled;
+    if (!appState.voiceEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+    els.voiceToggle.textContent = appState.voiceEnabled ? 'Voice: ON' : 'Voice: OFF';
+    els.voiceToggle.className = appState.voiceEnabled
+      ? 'px-2.5 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-medium transition'
+      : 'px-2.5 h-9 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs font-medium transition';
+  });
+
+  els.voiceSelect.addEventListener('change', () => {
+    appState.selectedVoiceURI = els.voiceSelect.value;
+    showToast('Voice updated — press Test Voice or Narrate.');
+  });
+
+  els.btnTestVoice.addEventListener('click', () => {
+    ensureAudioCtx();
+    populateVoices();
+    const frame = appState.game.frames[appState.currentPly];
+    const sample = generateNarration(frame, appState.game.headers, appState.style);
+    speakText(sample, appState.speed, 1.0, null, false);
+  });
+
+  els.sfxToggle.addEventListener('click', () => {
+    appState.sfxEnabled = !appState.sfxEnabled;
+    els.sfxToggle.textContent = appState.sfxEnabled ? 'SFX: ON' : 'SFX: OFF';
+    els.sfxToggle.className = appState.sfxEnabled
+      ? 'px-2.5 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-medium transition'
+      : 'px-2.5 h-9 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs font-medium transition';
+  });
+
+  els.championshipGame.addEventListener('change', () => {
+    championshipChoice = els.championshipGame.value;
+    if (appState.activePreset !== 'championship') displayedGameId = null;
+    appState.activePreset = 'championship';
+    updateChampionshipView();
+  });
+
+  els.btnPresetOpera.addEventListener('click', () => {
+    loadGame(PRESETS.opera_1858.pgn, PRESETS.opera_1858.curatedBeats, 'opera_1858');
+    showToast("Loaded Morphy's Opera Game (1858)");
+  });
+
+  document.querySelectorAll('.style-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      appState.style = btn.dataset.style;
+      document.querySelectorAll('.style-btn').forEach(b => {
+        b.className = b.dataset.style === appState.style
+          ? 'style-btn px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-600 text-white transition'
+          : 'style-btn px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white transition';
+      });
+      renderTeleprompter();
+    });
+  });
+
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      appState.speed = parseFloat(btn.dataset.speed);
+      document.querySelectorAll('.speed-btn').forEach(b => {
+        b.className = parseFloat(b.dataset.speed) === appState.speed
+          ? 'speed-btn px-2 py-1 rounded-md text-xs font-mono-num bg-slate-700 text-white transition'
+          : 'speed-btn px-2 py-1 rounded-md text-xs font-mono-num text-slate-300 hover:text-white transition';
+      });
+    });
+  });
+
+  els.moveList.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-ply]');
+    if (btn) jumpToPly(parseInt(btn.dataset.ply, 10));
+  });
+
+  els.sparkline.addEventListener('click', e => {
+    const rect = els.sparkline.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const targetPly = Math.round(ratio * (appState.game.frames.length - 1));
+    jumpToPly(targetPly);
+  });
+
+  document.getElementById('btn-copy-script').addEventListener('click', () => {
+    const lines = appState.game.frames.map(f => {
+      const tag = f.ply === 0 ? '[INTRO]' : `[${f.moveNumber}${f.side === 'White' ? '.' : '...'} ${f.san} | ${f.pacing.toUpperCase()}]`;
+      return `${tag} ${generateNarration(f, appState.game.headers, appState.style)}`;
+    });
+    const full = lines.join('\n');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(full).then(() => showToast('Full storytelling script copied!')).catch(() => fallbackCopy(full));
+    } else {
+      fallbackCopy(full);
+    }
+  });
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast('Full storytelling script copied!'); } catch (_) {}
+    document.body.removeChild(ta);
+  }
+
+  // Modal controls
+  function openModal() {
+    els.pgnError.classList.add('hidden');
+    els.modal.classList.remove('hidden');
+    els.pgnTextarea.focus();
+  }
+  function closeModal() {
+    els.modal.classList.add('hidden');
+  }
+
+  document.getElementById('btn-open-pgn').addEventListener('click', openModal);
+  document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+  document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+  els.modal.addEventListener('click', e => { if (e.target === els.modal) closeModal(); });
+
+  els.pgnFile.addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    els.fileNameLabel.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = () => { els.pgnTextarea.value = String(reader.result || ''); };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('btn-load-pgn').addEventListener('click', () => {
+    const raw = els.pgnTextarea.value.trim();
+    if (!raw) {
+      els.pgnError.textContent = 'Please paste a PGN or upload a .pgn file first.';
+      els.pgnError.classList.remove('hidden');
+      return;
+    }
+    try {
+      loadGame(raw, null, null);
+      closeModal();
+      showToast(`Loaded ${appState.game.frames.length - 1} plies — press Narrate!`);
+    } catch (err) {
+      els.pgnError.textContent = err.message || 'Invalid PGN format.';
+      els.pgnError.classList.remove('hidden');
+    }
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (!els.modal.classList.contains('hidden')) return;
+    if (e.target && e.target.closest('input, textarea, select, button, a')) return;
+    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+    if (e.code === 'ArrowRight') { e.preventDefault(); jumpToPly(appState.currentPly + 1); }
+    if (e.code === 'ArrowLeft') { e.preventDefault(); jumpToPly(appState.currentPly - 1); }
+  });
+
+  startChampionship();
+})();
+</script>
+</body>
+</html>

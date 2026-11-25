@@ -78,6 +78,9 @@
     .case-art { min-height: 168px; display: grid; place-items: center; padding: 18px; }
     .case-art img { width: 100px; height: 100px; object-fit: cover; border-radius: 16px; }
     .chess { background: conic-gradient(#243427 25%,#314735 0 50%,#243427 0 75%,#314735 0) 50% 50% / 48px 48px; }
+    .story-sample { max-width: 29ch; padding: 1.1rem 1.4rem; border-radius: 10px; background: #17231b; border: 1px solid #53695b; }
+    .story-sample strong { display: block; font: 500 2.4rem/1.25 var(--mono); color: var(--accent); }
+    .story-sample small { color: var(--muted); }
     .labour { background: #24332d; }
     .labour .visual-label { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
     .labour span { padding: .4rem .65rem; background: #1d2b25; border: 1px solid #53695b; border-radius: 6px; }
@@ -186,6 +189,15 @@
     <section id="projects" class="section" aria-labelledby="personal-title">
       <h2 id="personal-title">Personal projects</h2>
       <div class="project-grid">
+        <article id="chess-audio-storyteller" class="case featured">
+          <div class="case-art chess" aria-hidden="true"><div class="story-sample"><small>Gukesh vs. Sindarov · Game 2</small><strong>3. Bf4</strong>Gukesh brings his bishop out early and enters the London System.</div></div>
+          <div class="case-content">
+            <h3>Chess Audio Storyteller</h3>
+            <p>I built a chessboard that narrates each move as you replay a game. Follow the 2026 World Championship as new moves arrive, or import your own PGN and choose from three commentary styles.</p>
+            <ul class="tags"><li>JavaScript</li><li>Web Speech API</li><li>Lichess broadcasts</li></ul>
+            <div class="buttons" style="margin-top:auto"><a class="btn action primary" href="chess-audio-storyteller/">Open Chess Audio Storyteller</a><a class="btn action" href="https://github.com/venkatasubramani/venkatasubramani.github.io/tree/main/chess-audio-storyteller" aria-label="View Chess Audio Storyteller source on GitHub">View source</a></div>
+          </div>
+        </article>
         <article class="case">
           <div class="case-art chess" aria-hidden="true"><img src="static/chess.png" width="100" height="100" alt="" loading="lazy"></div>
           <div class="case-content">

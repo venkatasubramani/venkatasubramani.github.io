@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chess Audio Storyteller — PGN to Narrated Match Studio</title>
 <link rel="stylesheet" href="./studio.css">
+<link rel="stylesheet" href="./reactions.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -71,7 +72,7 @@
           <h1 class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">
             Chess Audio Storyteller
           </h1>
-          <p class="text-xs text-slate-400">Upload any PGN &middot; Live move-by-move audio bot &amp; storytelling pacing</p>
+          <p class="text-xs text-slate-400">Replay chess with commentary in US English or Tamil.</p>
         </div>
       </div>
 
@@ -90,9 +91,16 @@
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-    <a href="https://lichess.org/broadcast/fide-world-chess-championship-2026/qfkdt8mn" target="_blank" rel="noopener" class="font-medium text-emerald-300 underline underline-offset-2">2026 World Championship on Lichess</a>
-    <span id="championship-status" role="status" class="text-slate-400">Checking for games…</span>
+  <div class="studio-toolbar">
+    <div class="broadcast-info">
+      <a href="https://lichess.org/broadcast/fide-world-chess-championship-2026/qfkdt8mn" target="_blank" rel="noopener">2026 World Championship on Lichess</a>
+      <span id="championship-status" role="status">Checking for games…</span>
+    </div>
+    <div class="voice-tools">
+      <label for="voice-select">Audio language</label>
+      <select id="voice-select"><option value="en-US" lang="en-US">English (US)</option><option value="ta-IN" lang="ta">தமிழ் (Tamil)</option></select>
+      <button type="button" id="btn-test-voice">Preview voice</button>
+    </div>
   </div>
 
   <!-- Toast Banner -->
@@ -117,13 +125,13 @@
       </div>
 
       <!-- Top Player Bar -->
-      <div class="flex items-center justify-between px-1 text-xs sm:text-sm">
-        <div class="flex items-center gap-2">
-          <span id="top-color-dot" class="w-3 h-3 rounded-sm bg-slate-950 border border-slate-500 inline-block"></span>
-          <span id="top-player-name" class="font-semibold text-slate-200">Javokhir Sindarov</span>
-          <span id="top-player-elo" class="font-mono-num text-xs text-slate-400">(2782)</span>
+      <div class="player-rail" id="top-rail">
+        <span class="portrait" id="top-portrait" aria-hidden="true"><span class="portrait-art"></span><b class="portrait-mark" hidden></b></span>
+        <div class="player-info">
+          <div class="player-line"><span id="top-color-dot"></span><strong id="top-player-name"></strong><span id="top-player-elo" class="rating"></span></div>
+          <span id="top-reaction" class="reaction-label" hidden></span>
         </div>
-        <span id="top-turn-pill" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">TO MOVE</span>
+        <span id="top-turn-pill" class="turn-pill hidden">To move</span>
       </div>
 
       <!-- Eval Bar + Chessboard Container -->
@@ -154,18 +162,18 @@
       </div>
 
       <!-- Bottom Player Bar -->
-      <div class="flex items-center justify-between px-1 text-xs sm:text-sm max-w-[600px] mx-auto lg:mx-0 w-full">
-        <div class="flex items-center gap-2">
-          <span id="bottom-color-dot" class="w-3 h-3 rounded-sm bg-slate-100 border border-slate-400 inline-block"></span>
-          <span id="bottom-player-name" class="font-semibold text-slate-200">Gukesh Dommaraju</span>
-          <span id="bottom-player-elo" class="font-mono-num text-xs text-slate-400">(2710)</span>
+      <div class="player-rail" id="bottom-rail">
+        <span class="portrait" id="bottom-portrait" aria-hidden="true"><span class="portrait-art"></span><b class="portrait-mark" hidden></b></span>
+        <div class="player-info">
+          <div class="player-line"><span id="bottom-color-dot"></span><strong id="bottom-player-name"></strong><span id="bottom-player-elo" class="rating"></span></div>
+          <span id="bottom-reaction" class="reaction-label" hidden></span>
         </div>
-        <span id="bottom-turn-pill" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">TO MOVE</span>
+        <span id="bottom-turn-pill" class="turn-pill hidden">To move</span>
       </div>
 
       <!-- Transport & Audio Control Bar -->
       <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 max-w-[600px] mx-auto lg:mx-0 w-full">
-        <div class="flex items-center gap-1.5">
+        <div class="flex flex-wrap items-center gap-1.5">
           <button id="btn-first" type="button" title="First move" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono-num text-xs transition">|&lt;</button>
           <button id="btn-prev" type="button" title="Previous move (Left arrow)" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono-num text-sm transition">&lt;</button>
           <button id="btn-play" type="button" class="px-4 h-9 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition flex items-center gap-2">
@@ -174,6 +182,7 @@
           </button>
           <button id="btn-next" type="button" title="Next move (Right arrow)" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono-num text-sm transition">&gt;</button>
           <button id="btn-last" type="button" title="Final position" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono-num text-xs transition">&gt;|</button>
+          <button type="button" id="btn-next-highlight" class="highlight-jump">Next highlight <span aria-hidden="true">↗</span></button>
         </div>
 
         <div class="flex items-center gap-1.5">
@@ -196,11 +205,11 @@
       <!-- Narrator Persona & Speed Bar -->
       <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div class="text-[11px] font-medium text-slate-400 mb-1.5">Narrator Persona</div>
+          <div class="text-[11px] font-medium text-slate-400 mb-1.5">Commentary style</div>
           <div class="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800">
             <button data-style="storyteller" type="button" class="style-btn px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-600 text-white transition">Storyteller</button>
-            <button data-style="shorts" type="button" class="style-btn px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white transition">Hype Shorts</button>
-            <button data-style="coach" type="button" class="style-btn px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white transition">Club Coach</button>
+            <button data-style="shorts" type="button" class="style-btn px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white transition">Quick take</button>
+            <button data-style="coach" type="button" class="style-btn px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white transition">Club coach</button>
           </div>
         </div>
         <div>
@@ -210,17 +219,6 @@
             <button data-speed="1" type="button" class="speed-btn px-2 py-1 rounded-md text-xs font-mono-num bg-slate-700 text-white transition">1.0x</button>
             <button data-speed="1.25" type="button" class="speed-btn px-2 py-1 rounded-md text-xs font-mono-num text-slate-300 hover:text-white transition">1.25x</button>
           </div>
-        </div>
-        <div class="w-full pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
-          <div class="flex items-center gap-2 flex-1 min-w-[180px]">
-            <label for="voice-select" class="text-[11px] font-medium text-slate-400 shrink-0">Bot Voice</label>
-            <select id="voice-select" class="flex-1 min-w-0 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
-              <option value="">Loading browser voices...</option>
-            </select>
-          </div>
-          <button id="btn-test-voice" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-emerald-300 transition shrink-0">
-            Test Voice
-          </button>
         </div>
       </div>
 
@@ -249,7 +247,7 @@
         </p>
 
         <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-          <span id="pacing-hint">Pacing: Fast on quiet moves &middot; Slow &amp; dramatic on key moments</span>
+          <span id="pacing-hint">Move-by-move commentary</span>
           <button id="btn-copy-script" type="button" class="text-emerald-400 hover:text-emerald-300 font-medium shrink-0 ml-2">
             Copy Full Script
           </button>
@@ -268,10 +266,10 @@
       </div>
 
       <!-- Clickable Move List -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden flex flex-col">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl flex flex-col">
         <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-xs">
           <span class="font-semibold text-slate-300">Move List</span>
-          <span class="text-slate-400"><span class="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1"></span>Crucial move</span>
+          <details class="grade-help"><summary>Move symbols</summary><div><strong>!!</strong> Good or strong move &nbsp; <strong>??</strong> Blunder<br><strong>!?</strong> Interesting &nbsp; <strong>?!</strong> Inaccuracy &nbsp; <strong>?</strong> Mistake<p>Each reaction names its source. Unrated moves show a neutral face.</p><a href="https://lichess.org/study/iCORwmvf" target="_blank" rel="noopener">Championship annotations ↗</a></div></details>
         </div>
         <div id="move-list" class="thin-scroll max-h-60 overflow-y-auto p-2 grid grid-cols-1 gap-0.5 text-sm"></div>
       </div>
@@ -304,6 +302,11 @@
     </div>
   </div>
 
+<script src="./match-stories.js"></script>
+<script src="./match-analysis.js"></script>
+<script src="./review.js"></script>
+<script src="./commentary.js"></script>
+<script src="./voice.js"></script>
 <script>
 (function () {
   'use strict';
@@ -339,62 +342,7 @@
 [Result "1/2-1/2"]
 
 1. d4 d5 2. Nf3 Nf6 3. Bf4 c5 4. e3 e6 5. Nbd2 Nc6 6. c3 Be7 7. Ne5 Qb6 8. Rb1 Nxe5 9. Bxe5 Bd7 10. a4 O-O 11. Bd3 Qd8 12. O-O Rc8 13. Ra1 Be8 14. Qe2 Nd7 15. Bg3 f5 16. f3 Nf6 17. Be5 Nd7 18. Bg3 Nf6 19. Be5 Nd7 20. Bg3 Nf6 1/2-1/2`,
-      curatedBeats: {
-        0: {
-          pacing: 'dramatic',
-          storyteller: "Welcome to Game 2 of the 2026 FIDE World Chess Championship in Geneva. Defending champion Gukesh Dommaraju has the White pieces against Uzbek challenger Javokhir Sindarov, with the match tied half a point each.",
-          shorts: "World Championship Game 2 in Geneva! Gukesh has White against Sindarov—and watch how fast this London System turns into a psychological clock battle.",
-          coach: "In Game 2 of the 2026 World Championship, White aims to press for the first advantage while Black looks to equalize smoothly."
-        },
-        5: {
-          pacing: 'dramatic',
-          storyteller: "3. Bf4! Gukesh surprises the chess world with the London System—calling it a nostalgic opening he used to play as a teenager during the pandemic.",
-          shorts: "Wait—3. Bf4?! World Champion Gukesh plays the London System in a World Championship game!",
-          coach: "3. Bf4 establishes the London System, placing the dark-squared bishop outside the pawn chain before playing e3 and c3."
-        },
-        14: {
-          pacing: 'dramatic',
-          storyteller: "Here comes the first real test: 7...Qb6! Sindarov immediately eyes the undefended b2 pawn. Gukesh later admitted he knew this move existed, but couldn't fully recall his prep notes at the board.",
-          shorts: "7...Qb6! Sindarov hits b2 right away—and Gukesh actually forgot part of his prep right here!",
-          coach: "7...Qb6 is the classic counter against the London, targeting the b2 pawn that White's dark-squared bishop left behind."
-        },
-        15: {
-          pacing: 'normal',
-          storyteller: "8. Rb1. Gukesh calmly sidesteps the threat and defends b2 with the rook, keeping his queen flexible.",
-          shorts: "8. Rb1—calm defense, protecting b2 without trading queens.",
-          coach: "8. Rb1 protects the b2 pawn cleanly while avoiding weaknesses on the queenside."
-        },
-        22: {
-          pacing: 'normal',
-          storyteller: "11...Qd8. Mission accomplished—having nudged White's rook to b1, Sindarov tucks his queen back home to prepare a rock-solid defensive shell.",
-          shorts: "11...Qd8—Sindarov's queen heads home after disrupting White's rook.",
-          coach: "11...Qd8 reroutes the queen safely while preparing a flexible central setup."
-        },
-        30: {
-          pacing: 'dramatic',
-          storyteller: "15...f5! Sindarov clamps down on the e4 square and shuts down White's kingside ambitions. Meanwhile, the real drama is on the clock—Gukesh is trailing by nearly 40 minutes.",
-          shorts: "15...f5! Sindarov locks the center down—and Gukesh is now down almost 40 minutes on the clock!",
-          coach: "15...f5 prevents White from ever breaking with e4 and solidifies Black's kingside structure."
-        },
-        31: {
-          pacing: 'dramatic',
-          storyteller: "16. f3. After a long think that drains more of his clock, Gukesh prepares e4—but Sindarov's knight is ready to hop straight back to f6.",
-          shorts: "16. f3—Gukesh burns huge time trying to break through, but Black's fortress holds.",
-          coach: "16. f3 tries to support an eventual e4 pawn break, though White's clock deficit makes pushing risky."
-        },
-        33: {
-          pacing: 'dramatic',
-          storyteller: "17. Be5. Facing a fortress and a 40-minute clock deficit, Gukesh tests whether Sindarov wants to repeat moves—and the challenger happily obliges.",
-          shorts: "17. Be5! Gukesh offers the dance—and Sindarov gladly repeats.",
-          coach: "17. Be5 begins the repetition sequence; trailing badly on time, White decides not to overpress."
-        },
-        40: {
-          pacing: 'dramatic',
-          storyteller: "20...Nf6! Threefold repetition. Unlike Game 1, Sindarov claims the draw properly this time. A quick 20-move peace treaty in Geneva keeps the World Championship tied 1 to 1.",
-          shorts: "20...Nf6—threefold repetition! A 20-move draw in Geneva leaves Gukesh and Sindarov locked at 1–1!",
-          coach: "After 20...Nf6, the position repeats three times, ending Game 2 in a draw at 1–1."
-        }
-      }
+      curatedBeats: matchStories.second
     },
     opera_1858: {
       pgn: `[Event "Paris Opera"]
@@ -407,38 +355,7 @@
 [Result "1-0"]
 
 1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0`,
-      curatedBeats: {
-        0: {
-          pacing: 'dramatic',
-          storyteller: "Paris, 1858. Inside a private opera box, American prodigy Paul Morphy faces two consulting noblemen in the most famous attacking game in chess history.",
-          shorts: "The greatest 17-move attack in chess history! Watch Paul Morphy sacrifice everything inside a Paris opera box.",
-          coach: "Morphy's Opera Game is the ultimate masterclass in rapid piece development, open files, and attacking an uncastled king."
-        },
-        19: {
-          pacing: 'dramatic',
-          storyteller: "10. Nxb5! Boom! Morphy sacrifices a full knight just to rip open the highway straight toward Black's stranded king.",
-          shorts: "10. Nxb5!! Morphy sacks a whole knight on move 10—and Black's king is about to regret never castling!",
-          coach: "10. Nxb5 is a brilliant positional sacrifice: White gives up a knight for two pawns, open lines, and a crushing lead in development."
-        },
-        25: {
-          pacing: 'dramatic',
-          storyteller: "13. Rxd7! Morphy throws an exchange into the fire, eliminating the knight defending the d-file and dragging Black's rook into a deadly pin.",
-          shorts: "13. Rxd7!! Another sacrifice! Morphy rips away the defender and locks Black in a fatal pin.",
-          coach: "13. Rxd7 removes a key defender so White's second rook can swing to d1 with tempo."
-        },
-        31: {
-          pacing: 'dramatic',
-          storyteller: "16. Qb8+!! The immortal queen sacrifice! Black's knight is forced to capture, clearing the d8 square for one final blow.",
-          shorts: "16. Qb8+!! THE QUEEN SACRIFICE! Black has only one legal move—and it's curtains!",
-          coach: "16. Qb8+ deflects the d7 knight away from defending the d8 square, forcing checkmate on the next move."
-        },
-        33: {
-          pacing: 'dramatic',
-          storyteller: "17. Rd8 checkmate! Just a rook and a bishop left on the board, and every single piece Morphy developed delivered the knockout.",
-          shorts: "17. Rd8 CHECKMATE! Rook and bishop finish the job in 17 moves—pure chess art!",
-          coach: "17. Rd8# is the classic Opera Mate: the bishop on g5 protects the rook while cutting off the king's escape."
-        }
-      }
+      curatedBeats: matchStories.opera
     }
   };
 
@@ -800,35 +717,24 @@
     return Math.round(score);
   }
 
-  function readNotation(pgnText) {
-    const headers = Object.create(null);
-    let body = pgnText.replace(/\[(\w+)\s+"((?:\\.|[^"\\])*)"\s*\]/g, (_, key, value) => {
-      headers[key] = value.replace(/\\(["\\])/g, '$1');
-      return ' ';
-    });
-    body = body.replace(/\{[^}]*\}|;[^\r\n]*/g, ' ');
-    // Strip nested parentheses cleanly
-    let prev;
-    do {
-      prev = body;
-      body = body.replace(/\([^()]*\)/g, ' ');
-    } while (body !== prev);
-    body = body.replace(/\$\d+/g, ' ');
-    body = body.replace(/\d+\.(\.\.)?/g, ' ');
-    const tokens = body.trim().split(/\s+/).filter(Boolean);
-    const isResult = /^(1-0|0-1|1\/2-1\/2|\*)$/;
-    if (!headers.Result && tokens.length && isResult.test(tokens[tokens.length - 1])) {
-      headers.Result = tokens[tokens.length - 1];
-    }
-    return { headers, moves: tokens.filter(token => !isResult.test(token)) };
-  }
+  const readNotation = moveReview.read;
 
-  function buildGame({ headers, moves: tokens }, curatedBeats) {
+  function buildGame({ headers, moves: tokens, notes = [] }, curatedBeats) {
     if (!tokens.length) {
       throw new Error('No chess moves found in PGN text.');
     }
 
     let state = createInitialState();
+    const positions = new Map();
+    function remember(s) {
+      const rights = Object.keys(s.castling).filter(key => s.castling[key]).join('');
+      const ep = s.ep >= 0 && generateLegalMoves(s).some(m => m.epCapture) ? s.ep : '-';
+      const key = [s.board.map(piece => piece || '--').join(''), s.turn, rights, ep].join('/');
+      const count = (positions.get(key) || 0) + 1;
+      positions.set(key, count);
+      return count;
+    }
+    remember(state);
     const initialEval = evaluatePosition(state, false, false);
     const frames = [{
       ply: 0,
@@ -845,7 +751,7 @@
       isCheck: false,
       isMate: false,
       isCastle: false,
-      pacing: (curatedBeats && curatedBeats[0] && curatedBeats[0].pacing) || 'normal',
+      pacing: 'normal',
       curated: (curatedBeats && curatedBeats[0]) || null
     }];
 
@@ -861,16 +767,27 @@
       const oppLegal = generateLegalMoves(nextState);
       const inCheck = isKingInCheck(nextState.board, nextState.turn);
       const isMate = inCheck && oppLegal.length === 0;
-      const evalCp = evaluatePosition(nextState, isMate, inCheck);
+      const note = notes[idx] || {};
+      const previousCp = idx ? notes[idx - 1]?.cp : null;
+      const evalCp = Number.isFinite(note.cp) ? note.cp : evaluatePosition(nextState, isMate, inCheck);
+      const grade = moveReview.fromNotes(note, previousCp, side, isMate);
+      const piece = state.board[move.from][1];
+      const origin = indexToSq(move.from), square = indexToSq(move.to);
+      const captured = move.epCapture ? 'p' : state.board[move.to]?.[1];
+      const repeated = remember(nextState) >= 3;
+      const targets = attacksFrom(nextState.board, move.to);
+      const target = targets.find(i => {
+        const targetPiece = nextState.board[i];
+        return targetPiece && targetPiece[0] === nextState.turn && targetPiece[1] !== 'k' &&
+          PIECE_VAL[targetPiece[1]] > PIECE_VAL[piece];
+      });
       const prevEval = frames[frames.length - 1].evalCp;
       const evalSwing = evalCp - prevEval;
       const ply = idx + 1;
 
       const curated = (curatedBeats && curatedBeats[ply]) || null;
       let pacing = 'fast';
-      if (curated && curated.pacing) {
-        pacing = curated.pacing;
-      } else if (isMate || inCheck || Math.abs(evalSwing) >= 120) {
+      if (curated || grade || isMate || inCheck) {
         pacing = 'dramatic';
       } else if (move.capture || move.castle || ply <= 4 || ply === tokens.length) {
         pacing = 'normal';
@@ -883,7 +800,16 @@
         san,
         from: move.from,
         to: move.to,
-        piece: move.piece,
+        piece, origin, square, captured, repeated, grade,
+        uci: origin + square + (move.promo || ''),
+        hasBroadcastScores: Number.isFinite(note.cp) && Number.isFinite(previousCp),
+        enPassant: !!move.epCapture, promotion: move.promo,
+        develops: (piece === 'n' || piece === 'b') && ((state.turn === 'w' && origin[1] === '1') || (state.turn === 'b' && origin[1] === '8')) && moveNum <= 12,
+        recapture: !!captured && frames[idx].isCapture && frames[idx].to === move.to,
+        wasInCheck: frames[idx].isCheck, replyCount: oppLegal.length,
+        threat: target === undefined ? null : {piece: nextState.board[target][1], square: indexToSq(target)},
+        controlledCenter: targets.map(indexToSq).filter(sq => ['d4','d5','e4','e5'].includes(sq)).slice(0,2),
+        result: idx === tokens.length - 1 ? headers.Result : null,
         board: nextState.board.slice(),
         turn: nextState.turn,
         evalCp,
@@ -904,67 +830,26 @@
   // =========================================================================
   // 3. DYNAMIC STORYTELLING SCRIPT GENERATOR (3 PERSONAS)
   // =========================================================================
-  const PIECE_NAMES = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' };
-
+  function attacksFrom(board, from) {
+    const [side, piece] = board[from];
+    const steps = { n:[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]],
+      b:[[-1,-1],[-1,1],[1,-1],[1,1]], r:[[-1,0],[1,0],[0,-1],[0,1]],
+      p:[[side === 'w' ? -1 : 1,-1],[side === 'w' ? -1 : 1,1]] };
+    const directions = steps[piece] || [...steps.r, ...steps.b];
+    const slider = ['r','b','q'].includes(piece), targets = [];
+    for (const [dr,dc] of directions) {
+      let r = Math.floor(from / 8) + dr, c = from % 8 + dc;
+      while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+        const i = 8 * r + c;
+        targets.push(i);
+        if (board[i] || !slider) break;
+        r += dr; c += dc;
+      }
+    }
+    return targets;
+  }
   function generateNarration(frame, headers, style) {
-    if (frame.curated && frame.curated[style]) {
-      return frame.curated[style];
-    }
-
-    const white = headers.White || 'White';
-    const black = headers.Black || 'Black';
-    const actor = frame.side === 'White' ? white : black;
-    const opp = frame.side === 'White' ? black : white;
-    const targetSq = frame.to >= 0 ? indexToSq(frame.to) : '';
-    const pieceName = PIECE_NAMES[frame.piece] || 'piece';
-
-    if (frame.ply === 0) {
-      if (style === 'shorts') return `${white} versus ${black}—let's break down every crucial moment!`;
-      if (style === 'coach') return `Starting position for ${white} against ${black}. Watch how both sides fight for the center and king safety.`;
-      return `The pieces are set for ${white} versus ${black}. Let's follow the story of this game move by move.`;
-    }
-
-    if (frame.isMate) {
-      if (style === 'shorts') return `${frame.san}! CHECKMATE! ${actor} closes the show with an unstoppable knockout!`;
-      if (style === 'coach') return `${frame.san} delivers checkmate. ${opp}'s king has no escape squares left.`;
-      return `${frame.san}—and that is checkmate! ${actor} finishes the battle in decisive fashion.`;
-    }
-
-    if (frame.isCheck) {
-      if (style === 'shorts') return `${frame.san} with CHECK! ${actor} cranks up the pressure on ${opp}'s king!`;
-      if (style === 'coach') return `${frame.san} puts the enemy king in check, forcing an immediate defensive response.`;
-      return `Move ${frame.moveNumber}: ${actor} strikes with ${frame.san}, putting ${opp}'s king in check and seizing the initiative.`;
-    }
-
-    if (frame.isCastle) {
-      const sideWord = frame.san.includes('O-O-O') ? 'queenside' : 'kingside';
-      if (style === 'shorts') return `${actor} castles ${sideWord}—king tucked away, rook enters the fight!`;
-      if (style === 'coach') return `${frame.san}: ${actor} castles ${sideWord}, securing the king and activating the rook.`;
-      return `${actor} castles ${sideWord}, getting the king to safety as the tension builds.`;
-    }
-
-    if (Math.abs(frame.evalSwing) >= 180) {
-      const bigWord = frame.isCapture ? 'bold capture' : 'huge turning point';
-      if (style === 'shorts') return `HOLD ON! ${frame.san} changes everything—a ${bigWord} that flips the evaluation bar!`;
-      if (style === 'coach') return `Critical moment on move ${frame.moveNumber}: ${frame.san} shifts the evaluation sharply by ${(Math.abs(frame.evalSwing) / 100).toFixed(1)} pawns.`;
-      return `Turning point! ${actor} plays ${frame.san}, a ${bigWord} on ${targetSq} that dramatically tilts the balance of the game.`;
-    }
-
-    if (frame.isCapture) {
-      if (style === 'shorts') return `${frame.san}—pieces fly off the board on ${targetSq}!`;
-      if (style === 'coach') return `${frame.san} captures on ${targetSq}, reshaping the pawn structure and opening lines.`;
-      return `${actor} captures on ${targetSq} with ${frame.san}, trading down and clarifying the battle.`;
-    }
-
-    if (frame.ply <= 10) {
-      if (style === 'shorts') return `${frame.san}—clean opening development.`;
-      if (style === 'coach') return `${frame.san} develops the ${pieceName} to ${targetSq}, fighting for central control.`;
-      return `${actor} develops the ${pieceName} to ${targetSq} with ${frame.san}.`;
-    }
-
-    if (style === 'shorts') return `${frame.san}—${actor} repositions the ${pieceName} to ${targetSq}.`;
-    if (style === 'coach') return `${frame.san} improves the ${pieceName}'s placement on ${targetSq}.`;
-    return `${actor} maneuvers the ${pieceName} to ${targetSq} with ${frame.san}, probing for an edge.`;
+    return commentary.line(frame, headers, style, appState.locale);
   }
 
   // =========================================================================
@@ -1073,11 +958,8 @@
     style: 'storyteller',
     speed: 1.0,
     playTimer: null,
-    speakDelayTimer: null,
-    currentUtterance: null,
-    voices: [],
-    selectedVoiceURI: '',
-    speechBlockedNotified: false,
+
+    locale: 'en-US',
     activePreset: 'championship'
   };
 
@@ -1090,14 +972,6 @@
     matchPlayers: document.getElementById('match-players'),
     matchResult: document.getElementById('match-result'),
     matchOpening: document.getElementById('match-opening'),
-    topName: document.getElementById('top-player-name'),
-    topElo: document.getElementById('top-player-elo'),
-    topDot: document.getElementById('top-color-dot'),
-    topTurn: document.getElementById('top-turn-pill'),
-    botName: document.getElementById('bottom-player-name'),
-    botElo: document.getElementById('bottom-player-elo'),
-    botDot: document.getElementById('bottom-color-dot'),
-    botTurn: document.getElementById('bottom-turn-pill'),
     playBtn: document.getElementById('btn-play'),
     playIcon: document.getElementById('play-icon'),
     playLabel: document.getElementById('play-label'),
@@ -1123,6 +997,8 @@
     btnPresetOpera: document.getElementById('btn-preset-opera')
   };
 
+  try { if (localStorage.getItem('story-audio-locale') === 'ta-IN') appState.locale = 'ta-IN'; } catch {}
+  els.voiceSelect.value = appState.locale;
   let toastTimer = null;
   function showToast(msg) {
     els.toast.textContent = msg;
@@ -1132,7 +1008,8 @@
   }
 
   function formatEvalText(cp, isMate, turn) {
-    if (isMate) return 'M#';
+    if (isMate) return '#';
+    if (Math.abs(cp) >= 9900) return (cp > 0 ? '+' : '−') + 'M' + (10000 - Math.abs(cp));
     const pawns = cp / 100;
     const sign = pawns > 0 ? '+' : '';
     return sign + pawns.toFixed(1);
@@ -1146,25 +1023,38 @@
     const bElo = h.BlackElo ? `(${h.BlackElo})` : '';
     const frame = appState.game.frames[appState.currentPly];
 
-    if (!appState.flipped) {
-      els.topName.textContent = bName;
-      els.topElo.textContent = bElo;
-      els.topDot.className = 'w-3 h-3 rounded-sm bg-slate-950 border border-slate-500 inline-block';
-      els.botName.textContent = wName;
-      els.botElo.textContent = wElo;
-      els.botDot.className = 'w-3 h-3 rounded-sm bg-slate-100 border border-slate-400 inline-block';
-      els.topTurn.classList.toggle('hidden', frame.turn !== 'b' || frame.isMate);
-      els.botTurn.classList.toggle('hidden', frame.turn !== 'w' || frame.isMate);
-    } else {
-      els.topName.textContent = wName;
-      els.topElo.textContent = wElo;
-      els.topDot.className = 'w-3 h-3 rounded-sm bg-slate-100 border border-slate-400 inline-block';
-      els.botName.textContent = bName;
-      els.botElo.textContent = bElo;
-      els.botDot.className = 'w-3 h-3 rounded-sm bg-slate-950 border border-slate-500 inline-block';
-      els.topTurn.classList.toggle('hidden', frame.turn !== 'w' || frame.isMate);
-      els.botTurn.classList.toggle('hidden', frame.turn !== 'b' || frame.isMate);
+    const labels = {White: [wName,wElo], Black: [bName,bElo]};
+    function setRail(position, side) {
+      const [name, rating] = labels[side];
+      const face = document.getElementById(position + '-portrait');
+      const grade = frame.side === side ? frame.grade : null;
+      const badge = face.querySelector('.portrait-mark');
+      const avatar = /gukesh/i.test(name) ? 'gukesh' : /sindarov/i.test(name) ? 'sindarov' : 'generic';
+      face.dataset.player = avatar;
+      face.dataset.mood = grade?.mood || 'calm';
+      const art = face.querySelector('.portrait-art');
+      art.textContent = avatar === 'generic' ? (side === 'White' ? '♔' : '♚') : '';
+      badge.hidden = !grade;
+      badge.textContent = grade?.symbol || '';
+      const label = document.getElementById(position + '-reaction');
+      label.hidden = !grade;
+      label.lang = appState.locale;
+      label.textContent = grade ? (appState.locale === 'ta-IN' ? grade.ta : grade.en) + ' · ' + grade.source : '';
+      const rail = document.getElementById(position + '-rail');
+      const reactionId = grade ? [avatar,frame.ply,grade.symbol].join('-') : '';
+      if (reactionId && rail.dataset.reaction !== reactionId && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+        face.animate?.([{transform:'scale(.90) rotate(-4deg)'},{transform:'scale(1.07) rotate(2deg)'},{transform:'scale(1)'}],{duration:250});
+      }
+      rail.dataset.reaction = reactionId;
+      rail.dataset.mood = grade?.mood || 'calm';
+      document.getElementById(position + '-player-name').textContent = name;
+      document.getElementById(position + '-player-elo').textContent = rating;
+      document.getElementById(position + '-color-dot').className = 'color-dot ' + side.toLowerCase();
+      document.getElementById(position + '-turn-pill').classList.toggle('hidden',
+        frame.turn !== (side === 'White' ? 'w' : 'b') || frame.isMate || (frame.result && frame.result !== '*'));
     }
+    setRail('top', appState.flipped ? 'White' : 'Black');
+    setRail('bottom', appState.flipped ? 'Black' : 'White');
   }
 
   function renderBoard() {
@@ -1196,7 +1086,9 @@
           ? `<span class="absolute bottom-0.5 right-1 text-[10px] font-bold ${isLight ? 'text-emerald-900/70' : 'text-amber-50/75'} select-none pointer-events-none">${FILES[c]}</span>`
           : '';
 
-        html += `<div class="relative flex items-center justify-center ${sqClass}">${rankLabel}${fileLabel}${piece ? getPieceSVG(piece) : ''}</div>`;
+        const gradeBadge = sqIdx === frame.to && frame.grade
+          ? `<span aria-hidden="true" class="square-grade ${frame.grade.mood}">${frame.grade.symbol}</span>` : '';
+        html += `<div class="relative flex items-center justify-center ${sqClass}">${rankLabel}${fileLabel}${piece ? getPieceSVG(piece) : ''}${gradeBadge}</div>`;
       }
     }
     els.boardGrid.innerHTML = html;
@@ -1239,6 +1131,8 @@
   function renderTeleprompter() {
     const frame = appState.game.frames[appState.currentPly];
     const text = generateNarration(frame, appState.game.headers, appState.style);
+    els.narrationText.lang = appState.locale;
+    document.getElementById('pacing-hint').textContent = appState.locale === 'ta-IN' ? 'தமிழ் வர்ணனை' : 'US English commentary';
     els.narrationText.textContent = text;
 
     if (frame.ply === 0) {
@@ -1287,6 +1181,20 @@
     `;
   }
 
+  function moveBadge(frame) {
+    if (frame.grade) return `<span class="move-grade ${frame.grade.mood}" aria-label="${frame.grade.en}">${frame.grade.symbol}</span>`;
+    return frame.pacing === 'dramatic' ? '<span aria-hidden="true" class="quiet-dot"></span>' : '';
+  }
+  function highlightFrames() {
+    const marked = appState.game.frames.filter(f => f.grade);
+    const major = marked.filter(f => f.grade.symbol === '!!' || f.grade.symbol === '??');
+    return major.length ? major : marked;
+  }
+  document.getElementById('btn-next-highlight').addEventListener('click', () => {
+    const marked = highlightFrames();
+    const next = marked.find(f => f.ply > appState.currentPly) || marked[0];
+    if (next) jumpToPly(next.ply);
+  });
   function renderMoveList() {
     const frames = appState.game.frames;
     let html = '';
@@ -1295,8 +1203,8 @@
       const b = frames[i + 1];
       const wActive = appState.currentPly === w.ply;
       const bActive = b && appState.currentPly === b.ply;
-      const wDot = w.pacing === 'dramatic' ? '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block ml-1.5"></span>' : '';
-      const bDot = b && b.pacing === 'dramatic' ? '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block ml-1.5"></span>' : '';
+      const wDot = moveBadge(w);
+      const bDot = b ? moveBadge(b) : '';
 
       html += `
         <div class="grid grid-cols-12 items-center rounded-lg px-2 py-1 text-xs font-mono-num">
@@ -1310,6 +1218,7 @@
         </div>`;
     }
     els.moveList.innerHTML = html;
+    document.getElementById('btn-next-highlight').disabled = !highlightFrames().length;
 
     const activeBtn = els.moveList.querySelector(`button[data-ply="${appState.currentPly}"]`);
     if (activeBtn) {
@@ -1325,145 +1234,50 @@
     renderTeleprompter();
     renderSparkline();
     renderMoveList();
+    const game = appState.game, ply = appState.currentPly;
+    moveReview.review(game, ply, () => {
+      if (appState.game === game && appState.currentPly === ply && game.frames[ply].grade) {
+        renderBoard();
+        renderTeleprompter();
+        renderMoveList();
+      }
+    });
   }
 
   // =========================================================================
   // 7. LIVE AUDIO BOT PLAYBACK, VOICE LOADING & DYNAMIC PACING ENGINE
   // =========================================================================
-  function populateVoices() {
-    if (!('speechSynthesis' in window)) {
-      els.voiceSelect.innerHTML = '<option value="">Browser speech unavailable</option>';
-      return;
-    }
-    const rawVoices = window.speechSynthesis.getVoices() || [];
-    appState.voices = rawVoices;
-    if (!rawVoices.length) {
-      els.voiceSelect.innerHTML = '<option value="">Default system voice (loading...)</option>';
-      return;
-    }
-
-    // Prefer natural English voices first
-    const sorted = rawVoices.slice().sort((a, b) => {
-      const aEn = /^en/i.test(a.lang) ? 0 : 1;
-      const bEn = /^en/i.test(b.lang) ? 0 : 1;
-      if (aEn !== bEn) return aEn - bEn;
-      const aGood = /(Google|Natural|Samantha|Daniel|Alex|Microsoft|Aria|Guy)/i.test(a.name) ? 0 : 1;
-      const bGood = /(Google|Natural|Samantha|Daniel|Alex|Microsoft|Aria|Guy)/i.test(b.name) ? 0 : 1;
-      return aGood - bGood;
-    });
-
-    if (!appState.selectedVoiceURI && sorted.length) {
-      appState.selectedVoiceURI = sorted[0].voiceURI;
-    }
-
-    els.voiceSelect.innerHTML = sorted.map(v => {
-      const sel = v.voiceURI === appState.selectedVoiceURI ? 'selected' : '';
-      return `<option value="${v.voiceURI.replace(/"/g, '&quot;')}" ${sel}>${v.name} (${v.lang})</option>`;
-    }).join('');
+  let previewing = false;
+  function endPreview() {
+    previewing = false;
+    els.btnTestVoice.textContent = 'Preview voice';
   }
-
-  if ('speechSynthesis' in window) {
-    populateVoices();
-    window.speechSynthesis.onvoiceschanged = populateVoices;
-  }
-
-  function getActiveVoice() {
-    if (!appState.voices.length && 'speechSynthesis' in window) {
-      appState.voices = window.speechSynthesis.getVoices() || [];
+  function speakText(text, rate, pitch, onDone, preview = false) {
+    endPreview();
+    if (preview) {
+      previewing = true;
+      els.btnTestVoice.textContent = 'Stop preview';
     }
-    if (!appState.voices.length) return null;
-    return appState.voices.find(v => v.voiceURI === appState.selectedVoiceURI)
-      || appState.voices.find(v => /^en/i.test(v.lang))
-      || appState.voices[0];
-  }
-
-  function speakText(text, rate, pitch, onDone, isPlaySession) {
-    if (!('speechSynthesis' in window)) {
-      if (onDone) onDone();
-      return;
-    }
-    const synth = window.speechSynthesis;
-    clearTimeout(appState.speakDelayTimer);
-
-    const needsCancel = synth.speaking || synth.pending;
-    if (needsCancel) {
-      synth.cancel();
-    }
-
-    // Small delay after cancel() avoids Chrome's silent-drop bug
-    const launch = () => {
-      if (isPlaySession && !appState.isPlaying) return;
-      try { synth.resume(); } catch (_) {}
-
-      const utter = new SpeechSynthesisUtterance(text);
-      const voice = getActiveVoice();
-      if (voice) {
-        utter.voice = voice;
-        utter.lang = voice.lang || 'en-US';
-      } else {
-        utter.lang = 'en-US';
-      }
-      utter.volume = 1.0;
-      utter.rate = rate;
-      utter.pitch = pitch;
-
-      // Hold reference on appState to prevent Chrome GC mid-speech
-      appState.currentUtterance = utter;
-
-      let settled = false;
-      let started = false;
-      const finish = () => {
-        if (settled) return;
-        settled = true;
+    ensureAudioCtx();
+    narratorVoice.speak({text: commentary.saySquares(text, appState.locale), locale: appState.locale,
+      rate, pitch, context: audioCtx,
+      start: () => els.eq.classList.remove('eq-paused'),
+      done: () => { endPreview(); els.eq.classList.add('eq-paused'); if (onDone) onDone(); },
+      error: () => {
         els.eq.classList.add('eq-paused');
-        if (onDone) onDone();
-      };
-
-      utter.onstart = () => {
-        started = true;
-        els.eq.classList.remove('eq-paused');
-      };
-      utter.onend = finish;
-      utter.onerror = (ev) => {
-        if (ev && ev.error && ev.error !== 'interrupted' && ev.error !== 'canceled' && !appState.speechBlockedNotified) {
-          appState.speechBlockedNotified = true;
-          showToast('Voice playback was blocked by this browser preview — captions will still auto-advance.');
-        }
-        finish();
-      };
-
-      synth.speak(utter);
-
-      // Detect silent/blocked speech engine quickly and fall back to reading pace
-      const readMs = Math.max(2200, Math.round((text.split(/\s+/).length * 360) / appState.speed) + 900);
-      clearTimeout(appState.playTimer);
-      appState.playTimer = setTimeout(() => {
-        if (!settled) {
-          if (!started && !appState.speechBlockedNotified) {
-            appState.speechBlockedNotified = true;
-            showToast('Browser TTS unavailable in this preview — try Test Voice or open in a full tab.');
-          }
-          finish();
-        }
-      }, readMs + 1800);
-    };
-
-    if (needsCancel) {
-      appState.speakDelayTimer = setTimeout(launch, 60);
-    } else {
-      launch();
-    }
+        stopPlayback();
+        showToast(appState.locale === 'ta-IN' ? 'ஒலியை இயக்க முடியவில்லை. மீண்டும் முயலவும்.' :
+          'Audio could not play. Tap Narrate to try again.');
+      }
+    });
   }
 
   function stopPlayback() {
+    endPreview();
     appState.isPlaying = false;
     appState.waitingForBroadcast = false;
     clearTimeout(appState.playTimer);
-    clearTimeout(appState.speakDelayTimer);
-    appState.currentUtterance = null;
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
+    narratorVoice.cancel();
     els.playIcon.innerHTML = '&#9654;';
     els.playLabel.textContent = 'Narrate';
     els.eq.classList.add('eq-paused');
@@ -1495,7 +1309,7 @@
     const basePause = frame.pacing === 'dramatic' ? 950 : frame.pacing === 'normal' ? 450 : 250;
     const adjustedPause = Math.round(basePause / appState.speed);
 
-    if (appState.voiceEnabled && 'speechSynthesis' in window) {
+    if (appState.voiceEnabled) {
       const paceMult = frame.pacing === 'dramatic' ? 0.94 : frame.pacing === 'fast' ? 1.15 : 1.02;
       const rate = Math.min(2.0, Math.max(0.65, paceMult * appState.speed));
       const pitch = frame.pacing === 'dramatic' ? 1.04 : 1.0;
@@ -1503,7 +1317,7 @@
         if (autoAdvance && appState.isPlaying) {
           scheduleNextMove(adjustedPause);
         }
-      }, true);
+      });
     } else if (autoAdvance && appState.isPlaying) {
       const readMs = Math.max(900, Math.round((text.split(/\s+/).length * 240) / appState.speed)) + adjustedPause;
       scheduleNextMove(readMs);
@@ -1537,6 +1351,7 @@
 
   function loadGame(pgnText, curatedBeats, presetKey) {
     const parsed = buildGame(readNotation(pgnText), curatedBeats);
+    linkedMove = null;
     stopPlayback();
     displayGame(parsed, presetKey, 0);
   }
@@ -1570,7 +1385,10 @@
   const cacheKey = 'chess-audio-storyteller:wcc2026:v1';
   const refreshInterval = 60_000;
   const championshipGames = new Map();
-  const gameTwoMoves = readNotation(PRESETS.wcc2026_g2.pgn).moves.join(' ');
+  const presetLines = {1: readNotation(PRESETS.wcc2026_g1.pgn).moves, 2: readNotation(PRESETS.wcc2026_g2.pgn).moves};
+  const requested = new URLSearchParams(window.location.search);
+  let linkedMove = /^\d+(?:\.\d+)?$/.test(requested.get('round') || '') && /^\d{1,4}$/.test(requested.get('ply') || '')
+    ? { round:requested.get('round'), ply:Number(requested.get('ply')) } : null;
   let championshipChoice = 'latest';
   let displayedGameId = null;
   let lastChecked = 0;
@@ -1585,7 +1403,7 @@
     return '';
   }
 
-  function addChampionshipGame({ headers, moves }) {
+  function addChampionshipGame({ headers, moves, notes = [] }) {
     if (!Array.isArray(moves) || !moves.length || !headers || !headers.Round) return false;
     const white = playerName(headers.White);
     const black = playerName(headers.Black);
@@ -1594,24 +1412,44 @@
     const round = headers.Round.replace(/^(\d+)\.1$/, '$1');
     const chapter = /\/([A-Za-z0-9]{8})\/?$/.exec(headers.GameURL || '');
     const id = chapter ? chapter[1] : 'round-' + round;
+    const officialLine = presetLines[round];
+    const matches = officialLine && moves.length <= officialLine.length && moves.every((san,i) => officialLine[i] === san) &&
+      (round === '1' ? white === 'Javokhir Sindarov' : white === 'Gukesh Dommaraju');
+    const analysis = matches ? publishedAnalysis[round] : null;
+    const combinedNotes = moves.map((_,i) => {
+      const note = {...notes[i]};
+      if (analysis) {
+        if (!Number.isFinite(note.cp)) note.cp = analysis.evaluations[i];
+        if (!note.glyph && analysis.marks[i + 1]) {
+          note.glyph = analysis.marks[i + 1];
+          note.source = 'GM David Navara · Lichess study';
+        }
+        if (!note.glyph && round === '2' && (i + 1 === 14 || i + 1 === 15)) {
+          // The queen attacks b2; the rook defends it. Both positions remain close to level.
+          note.glyph = '!';
+          note.source = 'Storyteller pick';
+        }
+      }
+      return note;
+    });
     const notation = { headers: {
       Event: 'FIDE World Chess Championship 2026', Round: round, White: white, Black: black,
       WhiteElo: headers.WhiteElo || '', BlackElo: headers.BlackElo || '', Opening: headers.Opening || '',
       GameURL: headers.GameURL || '', Result: headers.Result || '*'
-    }, moves };
+    }, moves, notes: combinedNotes };
     const signature = JSON.stringify(notation);
     const previous = championshipGames.get(id);
     if (previous && previous.signature === signature) return true;
     // A delayed relay response can briefly show an already completed round as unfinished.
     if (previous && previous.game.headers.Result !== '*' && notation.headers.Result === '*') return true;
-    const curated = round === '2' && white === 'Gukesh Dommaraju' && moves.join(' ') === gameTwoMoves
-      ? PRESETS.wcc2026_g2.curatedBeats : null;
+    const curated = matches ? (round === '1' ? matchStories.first : matchStories.second) : null;
     const game = buildGame(notation, curated);
     championshipGames.set(id, { id, round, game, notation, signature });
     return true;
   }
 
   function pinChampionshipReplay() {
+    linkedMove = null;
     if (appState.activePreset === 'championship' && displayedGameId && championshipChoice === 'latest') {
       championshipChoice = displayedGameId;
       els.championshipGame.value = displayedGameId;
@@ -1623,6 +1461,8 @@
       b.round.localeCompare(a.round, 'en', { numeric: true }));
     if (!rounds.length) return;
     const newest = rounds[0];
+    const linkedGame = linkedMove && rounds.find(entry => entry.round === linkedMove.round);
+    if (linkedGame) championshipChoice = linkedGame.id;
     const picker = els.championshipGame;
     const labels = rounds.map(({ id, round, game }) => {
       const result = game.headers.Result;
@@ -1642,7 +1482,7 @@
     if (appState.activePreset !== 'championship') return;
 
     const target = championshipGames.get(championshipChoice) || newest;
-    if (appState.game === target.game) return;
+    if (appState.game === target.game && !linkedGame) return;
     const lastPly = target.game.frames.length - 1;
     const sameGame = displayedGameId === target.id && appState.game !== null;
     let ply = 0;
@@ -1653,6 +1493,10 @@
     } else {
       stopPlayback();
       if (championshipChoice === 'latest' && target.game.headers.Result === '*') ply = lastPly;
+    }
+    if (linkedGame) {
+      ply = Math.min(linkedMove.ply, lastPly);
+      linkedMove = null;
     }
     displayedGameId = target.id;
     displayGame(target.game, 'championship', ply);
@@ -1760,8 +1604,14 @@
   });
 
   els.voiceToggle.addEventListener('click', () => {
+    endPreview();
     appState.voiceEnabled = !appState.voiceEnabled;
-    if (!appState.voiceEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+    narratorVoice.cancel();
+    els.eq.classList.add('eq-paused');
+    if (appState.isPlaying && !appState.waitingForBroadcast) {
+      clearTimeout(appState.playTimer);
+      playCurrentPly(true);
+    }
     els.voiceToggle.textContent = appState.voiceEnabled ? 'Voice: ON' : 'Voice: OFF';
     els.voiceToggle.className = appState.voiceEnabled
       ? 'px-2.5 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-medium transition'
@@ -1769,16 +1619,22 @@
   });
 
   els.voiceSelect.addEventListener('change', () => {
-    appState.selectedVoiceURI = els.voiceSelect.value;
-    showToast('Voice updated — press Test Voice or Narrate.');
+    endPreview();
+    appState.locale = els.voiceSelect.value === 'ta-IN' ? 'ta-IN' : 'en-US';
+    try { localStorage.setItem('story-audio-locale', appState.locale); } catch {}
+    narratorVoice.cancel();
+    els.eq.classList.add('eq-paused');
+    clearTimeout(appState.playTimer);
+    renderAll();
+    if (appState.isPlaying && !appState.waitingForBroadcast) playCurrentPly(true);
   });
 
   els.btnTestVoice.addEventListener('click', () => {
-    ensureAudioCtx();
-    populateVoices();
+    const wasPreviewing = previewing;
+    stopPlayback();
+    if (wasPreviewing) return;
     const frame = appState.game.frames[appState.currentPly];
-    const sample = generateNarration(frame, appState.game.headers, appState.style);
-    speakText(sample, appState.speed, 1.0, null, false);
+    speakText(generateNarration(frame, appState.game.headers, appState.style), appState.speed, 1, null, true);
   });
 
   els.sfxToggle.addEventListener('click', () => {
@@ -1790,6 +1646,7 @@
   });
 
   els.championshipGame.addEventListener('change', () => {
+    linkedMove = null;
     championshipChoice = els.championshipGame.value;
     if (appState.activePreset !== 'championship') displayedGameId = null;
     appState.activePreset = 'championship';
@@ -1803,13 +1660,21 @@
 
   document.querySelectorAll('.style-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      endPreview();
       appState.style = btn.dataset.style;
       document.querySelectorAll('.style-btn').forEach(b => {
         b.className = b.dataset.style === appState.style
           ? 'style-btn px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-600 text-white transition'
           : 'style-btn px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white transition';
       });
-      renderTeleprompter();
+      if (appState.isPlaying && !appState.waitingForBroadcast) {
+        clearTimeout(appState.playTimer);
+        playCurrentPly(true);
+      } else {
+        narratorVoice.cancel();
+        els.eq.classList.add('eq-paused');
+        renderTeleprompter();
+      }
     });
   });
 
@@ -1838,7 +1703,7 @@
 
   document.getElementById('btn-copy-script').addEventListener('click', () => {
     const lines = appState.game.frames.map(f => {
-      const tag = f.ply === 0 ? '[INTRO]' : `[${f.moveNumber}${f.side === 'White' ? '.' : '...'} ${f.san} | ${f.pacing.toUpperCase()}]`;
+      const tag = f.ply === 0 ? (appState.locale === 'ta-IN' ? '[தொடக்கம்]' : '[INTRO]') : `[${f.moveNumber}${f.side === 'White' ? '.' : '...'} ${f.san} | ${f.pacing.toUpperCase()}]`;
       return `${tag} ${generateNarration(f, appState.game.headers, appState.style)}`;
     });
     const full = lines.join('\n');

@@ -1,0 +1,44 @@
+/* Keep the portrait outside the board so the moved piece is always visible. */
+.studio-toolbar {max-width:80rem; margin:auto; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:.65rem 1rem; padding:.85rem 1.5rem 0; font-size:.78rem}
+.broadcast-info,.voice-tools {display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .7rem}
+.broadcast-info a,.grade-help a {color:#86efcb; text-decoration:underline; text-underline-offset:3px}
+.broadcast-info span,.voice-tools label {color:#b7c6d8}
+.voice-tools select,.voice-tools button,.highlight-jump {min-height:36px; border:1px solid #3d5364; border-radius:8px; padding:.35rem .65rem; background:#132331; color:#e8f7f0; font-weight:600}
+.voice-tools select {color-scheme:dark}
+.voice-tools button:hover,.highlight-jump:hover {border-color:#70d8b4; background:#1b3441}
+.highlight-jump {color:#a1efd2; font-size:.73rem}
+.highlight-jump:disabled {opacity:.45; cursor:default}
+.player-rail {width:100%; max-width:600px; min-height:65px; margin-inline:auto; display:flex; align-items:center; gap:.65rem; padding:4px 9px 3px; border:1px solid #26374b; border-radius:12px; background:#101a29}
+.player-rail[data-mood=happy] {border-color:#31795f; background:linear-gradient(100deg,#123b32,#101a29 72%)}
+.player-rail[data-mood=surprised] {border-color:#92565f; background:linear-gradient(100deg,#382531,#101a29 72%)}
+.portrait {position:relative; isolation:isolate; flex:0 0 50px; width:50px; height:55px; display:grid; align-items:end}
+.portrait-art {display:grid; place-items:center; width:48px; height:48px; background-image:url('./players.webp'); background-size:300% 200%; background-position:0 0; background-repeat:no-repeat}
+.portrait[data-player=sindarov] .portrait-art {background-position-y:100%}
+.portrait[data-mood=happy] .portrait-art {background-position-x:50%}
+.portrait[data-mood=surprised] .portrait-art {background-position-x:100%}
+.portrait[data-player=generic] .portrait-art {background:none; border-radius:50%; background-color:#223546; font-size:1.8rem; color:#e8f4f4}
+.portrait-mark {position:absolute; left:50%; top:-3px; transform:translateX(-25%) rotate(7deg); min-width:24px; line-height:1.03; padding:1px 5px 2px; text-align:center; border-radius:8px 8px 8px 2px; border:2px solid #101a29; color:#082e20; background:#74f5b9; font:900 18px/1 ui-rounded,system-ui,sans-serif; z-index:1}
+.portrait-mark[hidden],.reaction-label[hidden] {display:none}
+.portrait[data-mood=surprised] .portrait-mark,.square-grade.surprised,.move-grade.surprised {background:#ff9d91; color:#411218}
+.portrait[data-mood=calm] .portrait-mark,.square-grade.calm,.move-grade.calm {background:#ffdb84; color:#3a2b0e}
+.player-info {min-width:0; flex:1}
+.player-line {display:flex; flex-wrap:wrap; align-items:center; gap:.35rem; color:#edf5fc; font-size:.87rem}
+.rating {color:#a3b5c9; font-size:.72rem}
+.color-dot {display:inline-block; width:9px; height:9px; border-radius:2px; border:1px solid #8391a0}
+.color-dot.black {background:#111827}.color-dot.white {background:#fff}
+.turn-pill {color:#88e8bf; font:650 .63rem/1.25 system-ui; letter-spacing:.03em; text-transform:uppercase; border:1px solid #365e55; border-radius:6px; padding:3px 6px; white-space:nowrap}
+.reaction-label {display:inline-block; color:#bfcedd; font-size:.7rem; line-height:1.35; overflow-wrap:anywhere}
+.player-rail[data-mood=happy] .reaction-label {color:#a2f1ce}
+.player-rail[data-mood=surprised] .reaction-label {color:#ffc6bd}
+.square-grade,.move-grade {background:#86f4be; color:#06351f; border-radius:6px; font:800 .72rem/1.08 system-ui,sans-serif; padding:1px 4px}
+.square-grade {position:absolute; top:2px; right:2px; font-size:clamp(.58rem,1.1vw,.78rem); z-index:1; pointer-events:none; box-shadow:0 0 0 1px #14243280}
+.move-grade {margin-left:.4rem}
+.quiet-dot {width:5px; height:5px; margin-left:.35rem; border-radius:50%; display:inline-block; background:#f5c15d}
+.grade-help {position:relative; color:#beccda}
+.grade-help summary {cursor:pointer}
+.grade-help div {position:absolute; right:0; z-index:3; width:min(16rem,70vw); padding:.75rem; margin-top:.35rem; border:1px solid #42556b; border-radius:8px; background:#162537; box-shadow:0 8px 25px #0007; line-height:1.6}
+.grade-help strong {color:#b3efd8}
+.grade-help p {margin:.4rem 0; line-height:1.4}
+#narration-text:lang(ta) {line-height:1.85; font-family:'Noto Sans Tamil',system-ui,sans-serif}
+@media(min-width:1024px){.player-rail {margin-inline:0}}
+@media(max-width:639px){.studio-toolbar {padding:.6rem 1rem 0}.broadcast-info {gap:.15rem .6rem}.voice-tools {width:100%}.player-rail {min-height:59px}.portrait {height:50px; flex-basis:44px; width:44px}.portrait-art {width:43px; height:43px}.portrait-mark {font-size:16px;top:-2px}.reaction-label {font-size:.67rem}.player-line {font-size:.78rem}}
